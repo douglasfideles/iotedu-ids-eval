@@ -1,1 +1,0 @@
-{"ts":1784170741.693952,"proto":"udp","note":"PortScan::Closed_Port_Access","msg":"[PORT-SCAN] [HIGH] Scanner: [PRIVATE] 172.18.0.240 | Target: [PRIVATE] 172.18.0.3 | Closed Port Attempts: 980","sub":"closed_ports","src":"172.18.0.240","dst":"172.18.0.3","p":53,"n":980,"actions":["Notice::ACTION_LOG"],"email_dest":[],"suppress_for":0.0}

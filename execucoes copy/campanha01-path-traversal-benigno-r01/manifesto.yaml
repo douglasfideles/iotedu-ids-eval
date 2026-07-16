@@ -1,0 +1,12 @@
+execucao_id: campanha01-path-traversal-benigno-r01
+campanha: campanha01
+cenario: path-traversal
+classe: benigno
+attacker_ip: 172.18.0.240
+alvo: backend=172.18.0.3:8000 frontend=172.18.0.4:3000
+interface: br-2606ac16617e
+t_start: 2026-07-16T03:13:23.349Z
+t_end: 2026-07-16T03:13:39.567Z
+gerador_rc: 0
+alertas: { suricata: 0, snort: 0, zeek: 0 }
+pcap_pacotes: 155

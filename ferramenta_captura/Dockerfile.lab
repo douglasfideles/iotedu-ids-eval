@@ -1,0 +1,13 @@
+FROM alpine:latest
+# Toolbox de laboratório: geradores de ataque + captura.
+RUN apk add --no-cache \
+    nmap nmap-scripts nmap-nping \
+    apache2-utils \
+    curl \
+    bind-tools \
+    tcpdump \
+    iproute2 \
+    bash \
+    coreutils \
+    python3
+CMD ["sleep", "infinity"]

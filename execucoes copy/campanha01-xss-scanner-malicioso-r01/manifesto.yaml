@@ -1,0 +1,12 @@
+execucao_id: campanha01-xss-scanner-malicioso-r01
+campanha: campanha01
+cenario: xss-scanner
+classe: malicioso
+attacker_ip: 172.18.0.240
+alvo: backend=172.18.0.3:8000 frontend=172.18.0.4:3000
+interface: br-2606ac16617e
+t_start: 2026-07-16T03:11:00.697Z
+t_end: 2026-07-16T03:11:37.712Z
+gerador_rc: 0
+alertas: { suricata: 5920, snort: 4704, zeek: 4540 }
+pcap_pacotes: 18941

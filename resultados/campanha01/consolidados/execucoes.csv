@@ -1,0 +1,17 @@
+execucao_id,cenario,classe,attacker_ip,t_start,t_end,suricata,snort,zeek,pcap_pacotes
+campanha01-http-flood-benigno-r01,http-flood,benigno,172.18.0.240,2026-07-16T02:42:31.152Z,2026-07-16T02:42:50.427Z,0,0,0,245
+campanha01-http-flood-malicioso-r01,http-flood,malicioso,172.18.0.240,2026-07-16T02:44:10.711Z,2026-07-16T02:44:50.359Z,12,0,67,62649
+campanha01-port-scan-benigno-r01,port-scan,benigno,172.18.0.240,2026-07-16T02:47:08.489Z,2026-07-16T02:47:27.254Z,0,0,2,71
+campanha01-port-scan-malicioso-r01,port-scan,malicioso,172.18.0.240,2026-07-16T02:49:11.328Z,2026-07-16T02:49:28.889Z,0,0,8794,8017
+campanha01-syn-flood-benigno-r01,syn-flood,benigno,172.18.0.240,2026-07-16T02:51:56.969Z,2026-07-16T02:52:12.517Z,0,0,20,125
+campanha01-syn-flood-malicioso-r01,syn-flood,malicioso,172.18.0.240,2026-07-16T02:54:15.506Z,2026-07-16T02:54:40.056Z,1775,1980,6023,4007
+campanha01-udp-flood-benigno-r01,udp-flood,benigno,172.18.0.240,2026-07-16T02:56:23.241Z,2026-07-16T02:56:50.030Z,0,0,18,41
+campanha01-udp-flood-malicioso-r01,udp-flood,malicioso,172.18.0.240,2026-07-16T02:58:30.339Z,2026-07-16T02:58:52.270Z,0,4250,1,1517
+campanha01-icmp-flood-benigno-r01,icmp-flood,benigno,172.18.0.240,2026-07-16T03:00:41.293Z,2026-07-16T03:01:03.702Z,0,5,0,18
+campanha01-icmp-flood-malicioso-r01,icmp-flood,malicioso,172.18.0.240,2026-07-16T03:02:46.090Z,2026-07-16T03:03:06.143Z,1470,4420,0,3008
+campanha01-sql-injection-benigno-r01,sql-injection,benigno,172.18.0.240,2026-07-16T03:04:49.888Z,2026-07-16T03:05:06.454Z,0,0,0,185
+campanha01-sql-injection-malicioso-r01,sql-injection,malicioso,172.18.0.240,2026-07-16T03:06:44.933Z,2026-07-16T03:07:21.963Z,6424,4662,6825,17649
+campanha01-xss-scanner-benigno-r01,xss-scanner,benigno,172.18.0.240,2026-07-16T03:09:03.299Z,2026-07-16T03:09:20.444Z,0,0,0,188
+campanha01-xss-scanner-malicioso-r01,xss-scanner,malicioso,172.18.0.240,2026-07-16T03:11:00.697Z,2026-07-16T03:11:37.712Z,5920,4704,4540,18941
+campanha01-path-traversal-benigno-r01,path-traversal,benigno,172.18.0.240,2026-07-16T03:13:23.349Z,2026-07-16T03:13:39.567Z,0,0,0,155
+campanha01-path-traversal-malicioso-r01,path-traversal,malicioso,172.18.0.240,2026-07-16T03:15:25.246Z,2026-07-16T03:16:01.914Z,1959,2403,3814,18727

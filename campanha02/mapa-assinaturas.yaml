@@ -1,0 +1,80 @@
+# =============================================================================
+# mapa-assinaturas.yaml — Mapa assinatura -> família de detecção (campanha02)
+#
+# Usado por classificar.py para decidir, a partir do texto `msg` de cada alerta
+# (Snort alert_fast.txt / Suricata eve.json), a QUAL FAMÍLIA o alerta pertence.
+# A comparação da família detectada com a família intencionada do cenário permite
+# separar:  TP (família certa) | FN puro (nenhum alerta) | ERRO DE CLASSIFICAÇÃO
+# (detectou, mas com assinatura de outra família).
+#
+# Prefixos de `msg`:
+#   "ATAQUE ->" e "LOCAL "  -> alerta de ATAQUE (classificar por família).
+#   "LOG ->" e "TESTE ->"   -> NÃO é ataque (ignorado; logging/diagnóstico benigno).
+# Padrões são regex, aplicados com re.search + IGNORECASE sobre o texto do msg.
+# SIDs de exemplo (auditoria) — a classificação NÃO depende do SID (colidem entre
+# IDS); é feita pelo texto do msg, que é específico por família.
+# =============================================================================
+
+ignorar_prefixos: ["LOG ->", "LOG->", "TESTE ->", "TESTE->"]
+
+# Ordem de precedência: a 1ª família cujo padrão casar vence (floods antes das
+# famílias de aplicação p/ que "UDP Flood (DNS Port 53)" caia em flood-udp, não dns).
+ordem: [flood-icmp, flood-syn, flood-udp, dos-http, sqli, xss, path-traversal, scan, ssh-brute, dns-tunneling]
+
+familias:
+  flood-icmp:
+    descricao: "Flood ICMP (ping flood, payload grande)"
+    sids_exemplo: [1000027, 1000003, 1000004]
+    padroes: ["ICMP Ping Flood", "ICMP Flood", "ICMP Large Payload"]
+  flood-syn:
+    descricao: "Flood TCP SYN"
+    sids_exemplo: [1000068, 1000160]
+    padroes: ["SYN Flood"]
+  flood-udp:
+    descricao: "Flood UDP"
+    sids_exemplo: [1000063, 1000064, 1000065, 1000066, 1000067]
+    padroes: ["UDP Flood"]
+  dos-http:
+    descricao: "DoS na camada de aplicação HTTP (GET/POST flood, slowloris)"
+    sids_exemplo: [1000021, 1000022, 1000073, 1000075, 1000008, 1000009, 1000012]
+    padroes: ["HTTP DoS", "DoS HTTP", "HTTP GET Flood", "HTTP POST Flood", "HTTP Flood",
+              "HTTP.*Flood", "Slowloris", "HTTP Large Header", "ApacheBench",
+              "Excessive GETs", "High RPS"]
+  sqli:
+    descricao: "SQL Injection"
+    sids_exemplo: [1000029, 1000030, 1000032, 1000005, 1000006, 1000007]
+    padroes: ["SQL Injection", "SQLi"]
+  xss:
+    descricao: "Cross-Site Scripting"
+    sids_exemplo: [1000040, 1000049]
+    padroes: ["XSS"]
+  path-traversal:
+    descricao: "Path Traversal / LFI"
+    sids_exemplo: [9000001, 9000012, 9000013]
+    padroes: ["Path Traversal"]
+  scan:
+    descricao: "Reconhecimento / varredura (port scan, ping sweep, SNMP, SMB enum)"
+    sids_exemplo: [1009441, 2000040, 1009633, 1000201, 1000093]
+    padroes: ["Port Scan", "PortScan", "Ping Sweep", "SNMP Scanner",
+              "SMB Enumeration", "SMB Enum", "nmap"]
+  ssh-brute:
+    descricao: "SSH Brute-Force"
+    sids_exemplo: [1000025, 1000026, 1000001, 1000002]
+    padroes: ["SSH Brute", "SSH Multiple", "SSH LibSSH", "SSH.*Frequent", "SSH.*Connections"]
+  dns-tunneling:
+    descricao: "DNS Tunneling / exfiltração via DNS"
+    sids_exemplo: [1000033, 1000034, 1000035, 1000013, 1000014, 1000015]
+    padroes: ["DNS Tunneling", "DNS Queries to", "NXDOMAIN"]
+
+# Cenário (slug do ataque) -> família intencionada (a "correta" para aquele ataque)
+cenarios:
+  icmp-flood:          flood-icmp
+  syn-flood:           flood-syn
+  udp-flood:           flood-udp
+  dos-http-simple:     dos-http
+  sql-injection:       sqli
+  xss-scanner:         xss
+  idor-path-traversal: path-traversal
+  port-scanner-tcp:    scan
+  ssh-bruteforce:      ssh-brute
+  dns-tunneling:       dns-tunneling

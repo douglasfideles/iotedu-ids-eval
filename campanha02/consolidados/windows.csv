@@ -1,0 +1,6 @@
+execucao_id,cenario,familia_intencionada,classe,attacker_ip,flush_ip,t_start,t_end,gerador_rc,pcap_pacotes
+campanha02-benigno-icmp-benigno-r01,benigno-icmp,icmp,benigno,172.30.0.20,172.30.0.250,2026-07-17T01:38:21.266Z,2026-07-17T01:39:40.750Z,0,129
+campanha02-benigno-dns-benigno-r01,benigno-dns,dns,benigno,172.30.0.20,172.30.0.250,2026-07-17T01:39:56.287Z,2026-07-17T01:41:38.005Z,0,3
+campanha02-port-scanner-tcp-malicioso-r01,port-scanner-tcp,scan,malicioso,172.30.0.10,172.30.0.250,2026-07-17T01:41:50.315Z,2026-07-17T01:42:47.840Z,0,2012
+campanha02-xss-scanner-malicioso-r01,xss-scanner,xss,malicioso,172.30.0.10,172.30.0.250,2026-07-17T01:43:20.458Z,2026-07-17T01:44:12.284Z,2,3
+campanha02-ssh-bruteforce-malicioso-r01,ssh-bruteforce,ssh-brute,malicioso,172.30.0.10,172.30.0.250,2026-07-17T01:44:42.313Z,2026-07-17T01:46:32.704Z,0,1046

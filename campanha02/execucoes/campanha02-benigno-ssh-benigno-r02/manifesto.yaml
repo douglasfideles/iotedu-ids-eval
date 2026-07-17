@@ -1,0 +1,11 @@
+execucao_id: campanha02-benigno-ssh-benigno-r02
+cenario: benigno-ssh
+classe: benigno
+familia_intencionada: ssh
+attacker_ip: 172.30.0.20
+flush_ip: 172.30.0.250
+interface: br-828636aac1f5
+t_start: 2026-07-17T13:27:24.793Z
+t_end: 2026-07-17T13:29:19.845Z
+gerador_rc: 0
+pcap_pacotes: 57

@@ -1,0 +1,133 @@
+        ___
+       __H__
+ ___ ___[,]_____ ___ ___  {1.10.7.110#dev}
+|_ -| . ["]     | .'| . |
+|___|_  ["]_|_|_|__,|  _|
+      |_|V...       |_|   https://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting @ 14:14:43 /2026-07-17/
+
+[1/1] URL:
+GET http://172.30.0.5:80/
+do you want to test this URL? [Y/n/q]
+> Y
+[14:14:44] [INFO] testing URL 'http://172.30.0.5:80/'
+[14:14:44] [INFO] using '/root/.local/share/sqlmap/output/results-07172026_0214pm.csv' as the CSV results file in multiple targets mode
+[14:14:44] [INFO] testing connection to the target URL
+got a 302 redirect to 'http://172.30.0.5/login.php'. Do you want to follow? [Y/n] Y
+you have not declared cookie(s), while server wants to set its own ('PHPSESSID=pgqoe00vu9v...fhsaeha6f3;security=low'). Do you want to use those [Y/n] Y
+[14:14:44] [INFO] checking if the target is protected by some kind of WAF/IPS
+[14:14:44] [INFO] testing if the target URL content is stable
+[14:14:44] [WARNING] parameter 'User-Agent' does not appear to be dynamic
+[14:14:46] [WARNING] heuristic (basic) test shows that parameter 'User-Agent' might not be injectable
+[14:14:46] [INFO] testing for SQL injection on parameter 'User-Agent'
+[14:14:46] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'
+[14:14:55] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause (subquery - comment)'
+[14:15:00] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause (comment)'
+[14:15:03] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause (MySQL comment)'
+[14:15:09] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause (Microsoft Access comment)'
+[14:15:13] [INFO] testing 'MySQL RLIKE boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause'
+[14:15:22] [INFO] testing 'MySQL AND boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (MAKE_SET)'
+[14:15:30] [INFO] testing 'PostgreSQL AND boolean-based blind - WHERE or HAVING clause (CAST)'
+[14:15:39] [INFO] testing 'Oracle AND boolean-based blind - WHERE or HAVING clause (CTXSYS.DRITHSX.SN)'
+[14:15:48] [INFO] testing 'SQLite AND boolean-based blind - WHERE or HAVING clause (JSON)'
+[14:15:57] [INFO] testing 'Boolean-based blind - Parameter replace (original value)'
+[14:15:57] [INFO] testing 'PostgreSQL boolean-based blind - Parameter replace'
+[14:15:57] [INFO] testing 'Microsoft SQL Server/Sybase boolean-based blind - Parameter replace'
+[14:15:58] [INFO] testing 'Oracle boolean-based blind - Parameter replace'
+[14:15:58] [INFO] testing 'Informix boolean-based blind - Parameter replace'
+[14:15:59] [INFO] testing 'Microsoft Access boolean-based blind - Parameter replace'
+[14:15:59] [INFO] testing 'Boolean-based blind - Parameter replace (DUAL)'
+[14:15:59] [INFO] testing 'Boolean-based blind - Parameter replace (DUAL - original value)'
+[14:16:00] [INFO] testing 'Boolean-based blind - Parameter replace (CASE)'
+[14:16:00] [INFO] testing 'Boolean-based blind - Parameter replace (CASE - original value)'
+[14:16:00] [INFO] testing 'MySQL >= 5.0 boolean-based blind - ORDER BY, GROUP BY clause'
+[14:16:01] [INFO] testing 'MySQL >= 5.0 boolean-based blind - ORDER BY, GROUP BY clause (original value)'
+[14:16:02] [INFO] testing 'MySQL < 5.0 boolean-based blind - ORDER BY, GROUP BY clause'
+[14:16:02] [INFO] testing 'PostgreSQL boolean-based blind - ORDER BY, GROUP BY clause'
+[14:16:03] [INFO] testing 'Microsoft SQL Server/Sybase boolean-based blind - ORDER BY clause'
+[14:16:04] [INFO] testing 'Oracle boolean-based blind - ORDER BY, GROUP BY clause'
+[14:16:05] [INFO] testing 'HAVING boolean-based blind - WHERE, GROUP BY clause'
+[14:16:13] [INFO] testing 'PostgreSQL boolean-based blind - Stacked queries'
+[14:16:18] [INFO] testing 'Microsoft SQL Server/Sybase boolean-based blind - Stacked queries (IF)'
+[14:16:23] [INFO] testing 'MySQL >= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)'
+[14:16:26] [INFO] testing 'MySQL >= 5.6 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (GTID_SUBSET)'
+[14:16:28] [INFO] testing 'MySQL >= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (UPDATEXML)'
+[14:16:31] [INFO] testing 'PostgreSQL AND error-based - WHERE or HAVING clause'
+[14:16:34] [INFO] testing 'Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clause (IN)'
+[14:16:37] [INFO] testing 'Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clause (CONVERT)'
+[14:16:40] [INFO] testing 'Microsoft SQL Server/Sybase AND error-based - WHERE or HAVING clause (CONCAT)'
+[14:16:43] [INFO] testing 'Oracle AND error-based - WHERE or HAVING clause (XMLType)'
+[14:16:45] [INFO] testing 'Oracle AND error-based - WHERE or HAVING clause (CTXSYS.DRITHSX.SN)'
+[14:16:48] [INFO] testing 'Oracle AND error-based - WHERE or HAVING clause (DBMS_UTILITY.SQLID_TO_SQLHASH)'
+[14:16:51] [INFO] testing 'Firebird AND error-based - WHERE or HAVING clause'
+[14:16:54] [INFO] testing 'MonetDB AND error-based - WHERE or HAVING clause'
+[14:16:56] [INFO] testing 'Vertica AND error-based - WHERE or HAVING clause'
+[14:16:59] [INFO] testing 'IBM DB2 AND error-based - WHERE or HAVING clause'
+[14:17:02] [INFO] testing 'ClickHouse AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause'
+[14:17:05] [INFO] testing 'H2 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (CAST)'
+[14:17:08] [INFO] testing 'MySQL >= 5.1 error-based - PROCEDURE ANALYSE (EXTRACTVALUE)'
+[14:17:11] [INFO] testing 'MySQL >= 5.6 error-based - Parameter replace (GTID_SUBSET)'
+[14:17:11] [INFO] testing 'MySQL >= 5.1 error-based - Parameter replace (EXTRACTVALUE)'
+[14:17:11] [INFO] testing 'PostgreSQL error-based - Parameter replace'
+[14:17:12] [INFO] testing 'Microsoft SQL Server/Sybase error-based - Parameter replace'
+[14:17:12] [INFO] testing 'Oracle error-based - Parameter replace'
+[14:17:12] [INFO] testing 'MySQL >= 5.6 error-based - ORDER BY, GROUP BY clause (GTID_SUBSET)'
+[14:17:12] [INFO] testing 'MySQL >= 5.1 error-based - ORDER BY, GROUP BY clause (EXTRACTVALUE)'
+[14:17:12] [INFO] testing 'PostgreSQL error-based - ORDER BY, GROUP BY clause'
+[14:17:13] [INFO] testing 'Microsoft SQL Server/Sybase error-based - Stacking (EXEC)'
+[14:17:14] [INFO] testing 'Generic inline queries'
+[14:17:14] [INFO] testing 'MySQL inline queries'
+[14:17:14] [INFO] testing 'PostgreSQL inline queries'
+[14:17:14] [INFO] testing 'Microsoft SQL Server/Sybase inline queries'
+[14:17:15] [INFO] testing 'Oracle inline queries'
+[14:17:15] [INFO] testing 'SQLite inline queries'
+[14:17:15] [INFO] testing 'Firebird inline queries'
+[14:17:15] [INFO] testing 'ClickHouse inline queries'
+[14:17:15] [INFO] testing 'MySQL >= 5.0.12 stacked queries (comment)'
+[14:17:17] [INFO] testing 'MySQL >= 5.0.12 stacked queries'
+[14:17:20] [INFO] testing 'MySQL >= 5.0.12 stacked queries (query SLEEP - comment)'
+[14:17:21] [INFO] testing 'PostgreSQL > 8.1 stacked queries (comment)'
+[14:17:23] [INFO] testing 'PostgreSQL < 8.2 stacked queries (Glibc - comment)'
+[14:17:24] [INFO] testing 'Microsoft SQL Server/Sybase stacked queries (comment)'
+[14:17:26] [INFO] testing 'Microsoft SQL Server/Sybase stacked queries (DECLARE - comment)'
+[14:17:27] [INFO] testing 'Oracle stacked queries (DBMS_PIPE.RECEIVE_MESSAGE - comment)'
+[14:17:29] [INFO] testing 'MySQL >= 5.0.12 AND time-based blind (query SLEEP)'
+[14:17:31] [INFO] testing 'MySQL >= 5.0.12 AND time-based blind (SLEEP)'
+[14:17:34] [INFO] testing 'MySQL >= 5.0.12 AND time-based blind (SLEEP - comment)'
+[14:17:36] [INFO] testing 'MySQL >= 5.0.12 AND time-based blind (query SLEEP - comment)'
+[14:17:38] [INFO] testing 'MySQL >= 5.0.12 RLIKE time-based blind'
+[14:17:40] [INFO] testing 'MySQL >= 5.0.12 RLIKE time-based blind (query SLEEP)'
+[14:17:43] [INFO] testing 'MySQL AND time-based blind (ELT)'
+[14:17:46] [INFO] testing 'PostgreSQL > 8.1 AND time-based blind'
+[14:17:49] [INFO] testing 'Microsoft SQL Server/Sybase time-based blind (IF)'
+[14:17:52] [INFO] testing 'Oracle AND time-based blind'
+[14:17:54] [INFO] testing 'MySQL >= 5.0.12 time-based blind - Parameter replace'
+[14:17:54] [INFO] testing 'MySQL >= 5.0.12 time-based blind - Parameter replace (substraction)'
+[14:17:54] [INFO] testing 'PostgreSQL > 8.1 time-based blind - Parameter replace'
+[14:17:55] [INFO] testing 'Oracle time-based blind - Parameter replace (DBMS_SESSION.SLEEP)'
+[14:17:55] [INFO] testing 'Oracle time-based blind - Parameter replace (DBMS_LOCK.SLEEP)'
+[14:17:55] [INFO] testing 'Oracle time-based blind - Parameter replace (DBMS_PIPE.RECEIVE_MESSAGE)'
+[14:17:55] [INFO] testing 'MySQL >= 5.0.12 time-based blind - ORDER BY, GROUP BY clause'
+[14:17:55] [INFO] testing 'PostgreSQL > 8.1 time-based blind - ORDER BY, GROUP BY clause'
+[14:17:56] [INFO] testing 'Oracle time-based blind - ORDER BY, GROUP BY clause (DBMS_SESSION.SLEEP)'
+[14:17:56] [INFO] testing 'Oracle time-based blind - ORDER BY, GROUP BY clause (DBMS_LOCK.SLEEP)'
+[14:17:56] [INFO] testing 'Oracle time-based blind - ORDER BY, GROUP BY clause (DBMS_PIPE.RECEIVE_MESSAGE)'
+it is recommended to perform only basic UNION tests if there is not at least one other (potential) technique found. Do you want to reduce the number of requests? [Y/n] Y
+[14:17:56] [INFO] testing 'Generic UNION query (NULL) - 1 to 10 columns'
+[14:18:02] [INFO] testing 'Generic UNION query (random number) - 1 to 10 columns'
+[14:18:07] [INFO] testing 'MySQL UNION query (NULL) - 1 to 10 columns'
+[14:18:13] [INFO] testing 'MySQL UNION query (random number) - 1 to 10 columns'
+[14:18:19] [WARNING] parameter 'User-Agent' does not seem to be injectable
+[14:18:19] [WARNING] parameter 'Referer' does not appear to be dynamic
+[14:18:19] [WARNING] heuristic (basic) test shows that parameter 'Referer' might not be injectable
+[14:18:19] [INFO] testing for SQL injection on parameter 'Referer'
+[14:18:19] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'
+[14:18:27] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause (subquery - comment)'
+[14:18:32] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause (comment)'
+[14:18:35] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause (MySQL comment)'
+[14:18:40] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause (Microsoft Access comment)'
+[14:18:44] [INFO] testing 'MySQL RLIKE boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause'
+[14:18:53] [INFO] testing 'MySQL AND boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause (MAKE_SET)'

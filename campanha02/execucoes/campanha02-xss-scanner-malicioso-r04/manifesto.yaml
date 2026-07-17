@@ -1,0 +1,11 @@
+execucao_id: campanha02-xss-scanner-malicioso-r04
+cenario: xss-scanner
+classe: malicioso
+familia_intencionada: xss
+attacker_ip: 172.30.0.10
+flush_ip: 172.30.0.250
+interface: br-828636aac1f5
+t_start: 2026-07-17T13:05:07.968Z
+t_end: 2026-07-17T13:06:23.161Z
+gerador_rc: 0
+pcap_pacotes: 943

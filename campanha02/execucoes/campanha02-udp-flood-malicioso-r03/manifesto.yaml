@@ -1,0 +1,11 @@
+execucao_id: campanha02-udp-flood-malicioso-r03
+cenario: udp-flood
+classe: malicioso
+familia_intencionada: flood-udp
+attacker_ip: 172.30.0.10
+flush_ip: 172.30.0.250
+interface: br-828636aac1f5
+t_start: 2026-07-17T14:36:01.135Z
+t_end: 2026-07-17T14:37:13.727Z
+gerador_rc: 124
+pcap_pacotes: 233602

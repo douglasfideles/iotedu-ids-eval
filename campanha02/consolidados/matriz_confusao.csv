@@ -1,0 +1,11 @@
+intencionada\prevista,NENHUM,dns-tunneling,dos-http,flood-icmp,flood-syn,flood-udp,path-traversal,scan,sqli,xss
+dns-tunneling,7,14,0,0,0,0,0,0,0,0
+dos-http,8,0,7,1,1,0,0,1,0,0
+flood-icmp,4,0,0,8,0,0,0,0,0,0
+flood-syn,2,0,0,0,22,0,0,3,0,0
+flood-udp,2,0,0,0,0,10,0,0,0,0
+path-traversal,1,0,16,0,0,0,7,0,0,0
+scan,10,0,0,0,0,0,0,5,0,0
+sqli,1,0,0,0,0,0,0,0,19,10
+ssh-brute,23,0,0,0,0,0,0,1,0,0
+xss,6,0,0,0,0,0,0,0,0,24

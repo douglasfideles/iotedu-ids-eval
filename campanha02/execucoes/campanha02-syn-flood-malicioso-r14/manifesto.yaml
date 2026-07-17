@@ -1,0 +1,11 @@
+execucao_id: campanha02-syn-flood-malicioso-r14
+cenario: syn-flood
+classe: malicioso
+familia_intencionada: flood-syn
+attacker_ip: 172.30.0.10
+flush_ip: 172.30.0.250
+interface: br-ac92cd59f868
+t_start: 2026-07-17T15:45:01.777Z
+t_end: 2026-07-17T15:46:12.343Z
+gerador_rc: 124
+pcap_pacotes: 1047

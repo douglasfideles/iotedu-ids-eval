@@ -77,19 +77,29 @@ def main():
              "(malicioso ou benigno), sem tráfego concorrente. Por janela salvam-se as fatias de "
              "alertas de cada IDS (por *byte-offset* + filtro de *timestamp*, que remove notices do "
              "Zeek escritos em lote e evita vazamento entre janelas), o PCAP, o stdout do gerador e um manifesto.\n")
-    L.append("**Os 10 ataques (família intencionada) e os 6 cenários benignos:**\n")
-    L.append("| Ataque (sbcup26) | Família | Alvo | | Benigno | Tráfego legítimo |")
-    L.append("|---|---|---|---|---|---|")
-    L.append("| icmp-flood | flood-icmp | .5 | | benigno-icmp | ping baixa taxa |")
-    L.append("| syn-flood | flood-syn | .5:80 | | benigno-http | GETs HTTP normais |")
-    L.append("| udp-flood | flood-udp | .5:80 | | benigno-dns | consultas DNS legítimas |")
-    L.append("| dos-http-simple | dos-http | .5:80 | | benigno-ssh | conexões SSH pontuais |")
-    L.append("| sql-injection | sqli | .5:80 | | benigno-scan | acesso normal a 1 serviço |")
-    L.append("| xss-scanner | xss | .5:80 | | benigno-mix | HTTP+DNS+ICMP+SSH leves |")
-    L.append("| idor-path-traversal | path-traversal | .5:80 | | | |")
-    L.append("| port-scanner-tcp | scan | .5 | | | |")
-    L.append("| ssh-bruteforce | ssh-brute | .6:22 | | | |")
-    L.append("| dns-tunneling | dns-tunneling | resolvers públicos | | | |")
+    L.append("**Os 10 ataques (família intencionada e alvo):**\n")
+    L.append("| # | Ataque (sbcup26) | Família | Alvo |")
+    L.append("|--:|---|---|---|")
+    L.append("| 1 | icmp-flood | flood-icmp | 172.30.0.5 |")
+    L.append("| 2 | syn-flood | flood-syn | 172.30.0.5:80 |")
+    L.append("| 3 | udp-flood | flood-udp | 172.30.0.5:80 |")
+    L.append("| 4 | dos-http-simple | dos-http | 172.30.0.5:80 |")
+    L.append("| 5 | sql-injection | sqli | 172.30.0.5:80 |")
+    L.append("| 6 | xss-scanner | xss | 172.30.0.5:80 |")
+    L.append("| 7 | idor-path-traversal | path-traversal | 172.30.0.5:80 |")
+    L.append("| 8 | port-scanner-tcp | scan | 172.30.0.5 |")
+    L.append("| 9 | ssh-bruteforce | ssh-brute | 172.30.0.6:22 |")
+    L.append("| 10 | dns-tunneling | dns-tunneling | resolvers públicos |")
+    L.append("")
+    L.append("**Os 6 cenários de tráfego benigno (avaliação de falsos positivos):**\n")
+    L.append("| Benigno | Tráfego legítimo |")
+    L.append("|---|---|")
+    L.append("| benigno-icmp | ping em baixa taxa |")
+    L.append("| benigno-http | GETs HTTP normais |")
+    L.append("| benigno-dns | consultas DNS legítimas |")
+    L.append("| benigno-ssh | conexões SSH pontuais |")
+    L.append("| benigno-scan | acesso normal a 1 serviço |")
+    L.append("| benigno-mix | HTTP+DNS+ICMP+SSH leves |")
     L.append("")
     L.append("**Classificação por janela e IDS.** `TP` = ≥1 alerta da família correta; "
              "`FN_PURO` = nenhum alerta de ataque; `ERRO_CLASSIF` = detectou, mas só com "
@@ -140,6 +150,8 @@ def main():
                      f"{m['precisao']} | {m['recall']} | {m['especificidade']} | {m['F1']} | "
                      f"{m['FPR']} | {m['acuracia_balanceada']} |")
         L.append("")
+        L.append("![Métricas de detecção por IDS](graficos/metricas_por_ids.png)\n")
+        L.append("![Rótulos por IDS (TP/erro-classif/FN/FP/TN)](graficos/rotulos_por_ids.png)\n")
 
     # ---- estatística por cenário (IC95) ----
     if estat:
@@ -153,12 +165,15 @@ def main():
                      f"{r.get('taxa_det') or '—'} | {ic} | {r.get('taxa_erro_classif') or '—'} | "
                      f"{r.get('taxa_fn_puro') or '—'} | {r.get('taxa_fp') or '—'} |")
         L.append("")
+        L.append("![Taxa de detecção por cenário (orquestração, IC 95%)](graficos/deteccao_por_cenario.png)\n")
 
     # ---- erros de classificação (o ponto central pedido) ----
     L.append("## 4. Erros de classificação (detecção com assinatura errada)\n")
     L.append("Casos em que o IDS **detectou** o ataque mas atribuiu assinatura de **outra "
              "família** (ex.: flood classificado como SQLi). Não é falso negativo (houve "
              "detecção) nem falso positivo. Tratado como categoria própria.\n")
+    L.append("![Matriz de confusão (intencionada × prevista)](graficos/matriz_confusao.png)\n")
+    L.append("![Erros de classificação por par](graficos/erros_classificacao.png)\n")
     erros = [d for d in detalhe if d["rotulo"] == "ERRO_CLASSIF"]
     if erros:
         L.append("| Cenário | IDS | Família correta | Classificada como | Janela |")

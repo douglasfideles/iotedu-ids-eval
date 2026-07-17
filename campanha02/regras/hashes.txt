@@ -1,4 +1,4 @@
-# hashes.txt — campanha02 — 2026-07-17T10:52:23.817Z
+# hashes.txt — campanha02 — 2026-07-17T15:07:55.980Z
 ## regras snort
 b76b2ff05933691cb782dd1aaa319d25b2bc01a38818f6a24bafdff054e98561  /mnt/d/PROJETOS/react/Git/mvpv1-snapshot/ids/rules/rules_snort/all.rules
 ef15146312993f8244c22a0e9cb68099bd76cf4bf866f33d080ccc537b7378ed  /mnt/d/PROJETOS/react/Git/mvpv1-snapshot/ids/rules/rules_snort/brute-force-ssh.rules
@@ -88,6 +88,6 @@ fd9ab73864674b4104ff75534b694062a9dd5b1e22a6ccccd09eb7587fa154ae  /mnt/d/PROJETO
 4987e11f1e43828f5b42849c58cbaf63db067f1163a1e6bb0b8903b87a4f2ab4  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/benigno.sh
 f5e8005b02a894d2016e6b0f0443da47a76dede387e9d8940fefbfd2adf272d6  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/classificar.py
 798475d4b0af703f3455a57d9c2ee4c8f3ad01bec7c86d82774b36a8ff2fb386  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/estatistica.py
-5c0e59856c9a59db608632f14fdcdb66cbc78850ffd4f34a89761669326287e5  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/gera_relatorio.py
+993b9e2f350d711c14e0cb2db8e55a627e65e71c9a238adc82b734d36c62688d  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/gera_relatorio.py
 936357a5f7087026c3f8461a9384d7945d39f8dfa4bee3ccdffa2b15c95b78b5  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/mapa-assinaturas.yaml
-798c5a6dad717f213b538aa0f8ff949050cf6038d7c568c7ed3987bf8cdfe1c7  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/rodar-campanha.sh
+7d704f6afeb52cb79fc0229205b8fed42761f9c44f39b3b8faa11518a1cdc4f7  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/rodar-campanha.sh

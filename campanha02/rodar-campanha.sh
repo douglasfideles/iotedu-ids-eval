@@ -256,8 +256,9 @@ analisar(){
   python3 "$HERE/classificar.py" "$WIN_CSV" "$EXE" "$HERE/mapa-assinaturas.yaml" "$CONS" || return 1
   python3 "$HERE/../ferramenta_captura/metricas.py" "$CONS/execucoes.csv" "$CONS"
   python3 "$HERE/estatistica.py" "$CONS/classificacao_detalhe.csv" "$CONS/execucoes.csv" "$CONS"
+  python3 "$HERE/graficos.py" "$CONS" "$OUT/graficos" 2>/dev/null || log "graficos.py falhou (matplotlib?)"
   python3 "$HERE/gera_relatorio.py" "$WIN_CSV" "$CONS" "$OUT/RELATORIO.md"
-  log "relatórios em $CONS/ e $OUT/RELATORIO.md"
+  log "relatórios em $CONS/, figuras em $OUT/graficos/ e $OUT/RELATORIO.md"
 }
 
 preparar(){ ensure_net && start_targets && start_ids && health; freeze; }
@@ -282,6 +283,34 @@ executar(){ # $1 = reps
   analisar
 }
 
+continuar(){ # retoma: religa a infra e roda SÓ as janelas (cenario,rep) que faltam no windows.csv
+  preparar || return 1
+  local faltantes=() cen rep id
+  for rep in $(seq 1 "$REPS"); do
+    for cen in "${ORDEM_ATAQUES[@]}"; do
+      id=$(printf 'campanha02-%s-malicioso-r%02d' "$cen" "$rep")
+      grep -q "^$id," "$WIN_CSV" 2>/dev/null || faltantes+=("atk:$cen:$rep")
+    done
+    for cen in "${ORDEM_BENIGNOS[@]}"; do
+      id=$(printf 'campanha02-%s-benigno-r%02d' "$cen" "$rep")
+      grep -q "^$id," "$WIN_CSV" 2>/dev/null || faltantes+=("ben:$cen:$rep")
+    done
+  done
+  if [ "${#faltantes[@]}" -eq 0 ]; then log "nada a fazer: 240 janelas já capturadas"; analisar; return; fi
+  mapfile -t faltantes < <(printf '%s\n' "${faltantes[@]}" | shuf)
+  local ja=$(( $(grep -c . "$WIN_CSV" 2>/dev/null || echo 1) - 1 ))
+  log "retomando: ${ja} janelas já existem; faltam ${#faltantes[@]} (alvo 240)"
+  local i=0
+  for item in "${faltantes[@]}"; do
+    i=$((i+1))
+    local tipo="${item%%:*}"; local resto="${item#*:}"
+    local cen="${resto%:*}"; local rep="${resto##*:}"
+    log "[$i/${#faltantes[@]} | total $((ja+i))/240] $tipo $cen r$rep"
+    if [ "$tipo" = atk ]; then rodar_ataque "$cen" "$rep"; else rodar_benigno "$cen" "$rep"; fi
+  done
+  analisar
+}
+
 parar(){
   log "parando alvos e rede; IDS podem continuar (use compose down se quiser)"
   docker rm -f c02-http c02-ssh c02-atk >/dev/null 2>&1
@@ -292,10 +321,11 @@ case "${1:-}" in
   preparar) preparar ;;
   piloto|pilancar) preparar && REPS=1 executar 1 ;;
   completa) preparar && executar "$REPS" ;;
+  continuar) continuar ;;
   executar) executar "${2:-$REPS}" ;;
   analisar) analisar ;;
   parar) parar ;;
-  *) echo "uso: $0 {preparar|piloto|completa|executar [N]|analisar|parar}"
+  *) echo "uso: $0 {preparar|piloto|completa|continuar|executar [N]|analisar|parar}"
      echo "  env úteis: REPS=$REPS BENIGN_DUR=$BENIGN_DUR SETTLE=$SETTLE ATTACK_MAX=$ATTACK_MAX PCAP=$PCAP"
      exit 2;;
 esac

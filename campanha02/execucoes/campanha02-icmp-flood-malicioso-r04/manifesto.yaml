@@ -1,0 +1,11 @@
+execucao_id: campanha02-icmp-flood-malicioso-r04
+cenario: icmp-flood
+classe: malicioso
+familia_intencionada: flood-icmp
+attacker_ip: 172.30.0.10
+flush_ip: 172.30.0.250
+interface: br-ac92cd59f868
+t_start: 2026-07-17T18:21:48.358Z
+t_end: 2026-07-17T18:22:39.747Z
+gerador_rc: 124
+pcap_pacotes: 341157

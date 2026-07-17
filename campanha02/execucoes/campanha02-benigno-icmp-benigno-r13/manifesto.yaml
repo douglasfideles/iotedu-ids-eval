@@ -1,0 +1,11 @@
+execucao_id: campanha02-benigno-icmp-benigno-r13
+cenario: benigno-icmp
+classe: benigno
+familia_intencionada: icmp
+attacker_ip: 172.30.0.20
+flush_ip: 172.30.0.250
+interface: br-ac92cd59f868
+t_start: 2026-07-17T15:56:38.696Z
+t_end: 2026-07-17T15:58:37.311Z
+gerador_rc: 0
+pcap_pacotes: 171

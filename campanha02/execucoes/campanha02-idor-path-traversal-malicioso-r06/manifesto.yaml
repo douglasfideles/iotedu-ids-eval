@@ -1,0 +1,11 @@
+execucao_id: campanha02-idor-path-traversal-malicioso-r06
+cenario: idor-path-traversal
+classe: malicioso
+familia_intencionada: path-traversal
+attacker_ip: 172.30.0.10
+flush_ip: 172.30.0.250
+interface: br-ac92cd59f868
+t_start: 2026-07-17T16:13:55.779Z
+t_end: 2026-07-17T16:14:54.525Z
+gerador_rc: 0
+pcap_pacotes: 3086

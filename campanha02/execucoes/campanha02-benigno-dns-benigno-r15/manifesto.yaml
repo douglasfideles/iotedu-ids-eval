@@ -1,0 +1,11 @@
+execucao_id: campanha02-benigno-dns-benigno-r15
+cenario: benigno-dns
+classe: benigno
+familia_intencionada: dns
+attacker_ip: 172.30.0.20
+flush_ip: 172.30.0.250
+interface: br-ac92cd59f868
+t_start: 2026-07-17T15:10:35.647Z
+t_end: 2026-07-17T15:12:45.313Z
+gerador_rc: 0
+pcap_pacotes: 3

@@ -1,0 +1,11 @@
+execucao_id: campanha02-dns-tunneling-malicioso-r07
+cenario: dns-tunneling
+classe: malicioso
+familia_intencionada: dns-tunneling
+attacker_ip: 172.30.0.10
+flush_ip: 172.30.0.250
+interface: br-ac92cd59f868
+t_start: 2026-07-17T16:07:43.378Z
+t_end: 2026-07-17T16:09:20.931Z
+gerador_rc: 0
+pcap_pacotes: 412

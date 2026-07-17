@@ -10,20 +10,31 @@ Ataques gerados a partir de `sbcup2026-ataques` contra alvos leves numa rede doc
 
 **Unidade de análise.** A *janela rotulada*: uma execução isolada de UM cenário (malicioso ou benigno), sem tráfego concorrente. Por janela salvam-se as fatias de alertas de cada IDS (por *byte-offset* + filtro de *timestamp*, que remove notices do Zeek escritos em lote e evita vazamento entre janelas), o PCAP, o stdout do gerador e um manifesto.
 
-**Os 10 ataques (família intencionada) e os 6 cenários benignos:**
+**Os 10 ataques (família intencionada e alvo):**
 
-| Ataque (sbcup26) | Família | Alvo | | Benigno | Tráfego legítimo |
-|---|---|---|---|---|---|
-| icmp-flood | flood-icmp | .5 | | benigno-icmp | ping baixa taxa |
-| syn-flood | flood-syn | .5:80 | | benigno-http | GETs HTTP normais |
-| udp-flood | flood-udp | .5:80 | | benigno-dns | consultas DNS legítimas |
-| dos-http-simple | dos-http | .5:80 | | benigno-ssh | conexões SSH pontuais |
-| sql-injection | sqli | .5:80 | | benigno-scan | acesso normal a 1 serviço |
-| xss-scanner | xss | .5:80 | | benigno-mix | HTTP+DNS+ICMP+SSH leves |
-| idor-path-traversal | path-traversal | .5:80 | | | |
-| port-scanner-tcp | scan | .5 | | | |
-| ssh-bruteforce | ssh-brute | .6:22 | | | |
-| dns-tunneling | dns-tunneling | resolvers públicos | | | |
+| # | Ataque (sbcup26) | Família | Alvo |
+|--:|---|---|---|
+| 1 | icmp-flood | flood-icmp | 172.30.0.5 |
+| 2 | syn-flood | flood-syn | 172.30.0.5:80 |
+| 3 | udp-flood | flood-udp | 172.30.0.5:80 |
+| 4 | dos-http-simple | dos-http | 172.30.0.5:80 |
+| 5 | sql-injection | sqli | 172.30.0.5:80 |
+| 6 | xss-scanner | xss | 172.30.0.5:80 |
+| 7 | idor-path-traversal | path-traversal | 172.30.0.5:80 |
+| 8 | port-scanner-tcp | scan | 172.30.0.5 |
+| 9 | ssh-bruteforce | ssh-brute | 172.30.0.6:22 |
+| 10 | dns-tunneling | dns-tunneling | resolvers públicos |
+
+**Os 6 cenários de tráfego benigno (avaliação de falsos positivos):**
+
+| Benigno | Tráfego legítimo |
+|---|---|
+| benigno-icmp | ping em baixa taxa |
+| benigno-http | GETs HTTP normais |
+| benigno-dns | consultas DNS legítimas |
+| benigno-ssh | conexões SSH pontuais |
+| benigno-scan | acesso normal a 1 serviço |
+| benigno-mix | HTTP+DNS+ICMP+SSH leves |
 
 **Classificação por janela e IDS.** `TP` = ≥1 alerta da família correta; `FN_PURO` = nenhum alerta de ataque; `ERRO_CLASSIF` = detectou, mas só com assinatura de **outra** família (nem TP, nem FN puro); `FP` = janela benigna com qualquer alerta de ataque; `TN` = benigna sem alerta. A rajada de *flush* e alertas fora do intervalo da janela são descartados.
 
@@ -31,9 +42,9 @@ Ataques gerados a partir de `sbcup2026-ataques` contra alvos leves numa rede doc
 
 ## 1. Resumo da captura
 
-- **Janelas avaliadas:** 118 (71 maliciosas, 47 benignas)
-- **Horas de captura (total):** 3.58 h  (maliciosa: 1.98 h · benigna: 1.61 h)
-- **Pacotes capturados (total):** 3,016,036 (maliciosa: 3,004,250 · benigna: 11,786)
+- **Janelas avaliadas:** 240 (150 maliciosas, 90 benignas)
+- **Horas de captura (total):** 6.88 h  (maliciosa: 3.81 h · benigna: 3.07 h)
+- **Pacotes capturados (total):** 10,288,250 (maliciosa: 10,266,618 · benigna: 21,632)
 - **Tipos de tráfego malicioso (10):** dns-tunneling, dos-http-simple, icmp-flood, idor-path-traversal, port-scanner-tcp, sql-injection, ssh-bruteforce, syn-flood, udp-flood, xss-scanner
 - **Tipos de tráfego benigno (6):** benigno-dns, benigno-http, benigno-icmp, benigno-mix, benigno-scan, benigno-ssh
 
@@ -41,22 +52,22 @@ Ataques gerados a partir de `sbcup2026-ataques` contra alvos leves numa rede doc
 
 | Cenário | Classe | Repetições | Horas | Pacotes |
 |---|---|--:|--:|--:|
-| benigno-dns | benigno | 7 | 0.25 | 21 |
-| benigno-http | benigno | 8 | 0.28 | 6,361 |
-| benigno-icmp | benigno | 7 | 0.23 | 1,193 |
-| benigno-mix | benigno | 12 | 0.40 | 2,880 |
-| benigno-scan | benigno | 5 | 0.18 | 879 |
-| benigno-ssh | benigno | 8 | 0.27 | 452 |
-| dns-tunneling | malicioso | 7 | 0.17 | 2,869 |
-| dos-http-simple | malicioso | 6 | 0.11 | 12,030 |
-| icmp-flood | malicioso | 4 | 0.07 | 1,908,912 |
-| idor-path-traversal | malicioso | 8 | 0.11 | 24,293 |
-| port-scanner-tcp | malicioso | 5 | 0.06 | 10,058 |
-| sql-injection | malicioso | 10 | 0.81 | 116,533 |
-| ssh-bruteforce | malicioso | 8 | 0.24 | 8,383 |
-| syn-flood | malicioso | 9 | 0.15 | 9,415 |
-| udp-flood | malicioso | 4 | 0.08 | 902,640 |
-| xss-scanner | malicioso | 10 | 0.16 | 9,117 |
+| benigno-dns | benigno | 15 | 0.53 | 45 |
+| benigno-http | benigno | 15 | 0.51 | 11,936 |
+| benigno-icmp | benigno | 15 | 0.50 | 2,559 |
+| benigno-mix | benigno | 15 | 0.50 | 3,600 |
+| benigno-scan | benigno | 15 | 0.52 | 2,633 |
+| benigno-ssh | benigno | 15 | 0.51 | 859 |
+| dns-tunneling | malicioso | 15 | 0.37 | 6,150 |
+| dos-http-simple | malicioso | 15 | 0.30 | 30,075 |
+| icmp-flood | malicioso | 15 | 0.25 | 6,337,885 |
+| idor-path-traversal | malicioso | 15 | 0.23 | 45,691 |
+| port-scanner-tcp | malicioso | 15 | 0.19 | 30,172 |
+| sql-injection | malicioso | 15 | 1.20 | 163,196 |
+| ssh-bruteforce | malicioso | 15 | 0.46 | 15,636 |
+| syn-flood | malicioso | 15 | 0.26 | 15,225 |
+| udp-flood | malicioso | 15 | 0.31 | 3,608,876 |
+| xss-scanner | malicioso | 15 | 0.24 | 13,712 |
 
 ## 2. Métricas de detecção (família-correta) por IDS
 
@@ -64,67 +75,77 @@ Ataques gerados a partir de `sbcup2026-ataques` contra alvos leves numa rede doc
 
 | Alvo | TP | FP | TN | FN | Precisão | Recall | Especif. | F1 | FPR | Acur.Bal. |
 |---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
-| **suricata** | 49 | 0 | 47 | 22 | 1.000 | 0.690 | 1.000 | 0.817 | 0.000 | 0.845 |
-| **snort** | 31 | 0 | 47 | 40 | 1.000 | 0.437 | 1.000 | 0.608 | 0.000 | 0.718 |
-| **zeek** | 36 | 6 | 41 | 35 | 0.857 | 0.507 | 0.872 | 0.637 | 0.128 | 0.690 |
-| **orquestracao** | 61 | 6 | 41 | 10 | 0.910 | 0.859 | 0.872 | 0.884 | 0.128 | 0.866 |
+| **suricata** | 101 | 0 | 90 | 49 | 1.000 | 0.673 | 1.000 | 0.805 | 0.000 | 0.837 |
+| **snort** | 69 | 0 | 90 | 81 | 1.000 | 0.460 | 1.000 | 0.630 | 0.000 | 0.730 |
+| **zeek** | 60 | 8 | 82 | 90 | 0.882 | 0.400 | 0.911 | 0.550 | 0.089 | 0.656 |
+| **orquestracao** | 122 | 8 | 82 | 28 | 0.938 | 0.813 | 0.911 | 0.871 | 0.089 | 0.862 |
+
+![Métricas de detecção por IDS](graficos/metricas_por_ids.png)
+
+![Rótulos por IDS (TP/erro-classif/FN/FP/TN)](graficos/rotulos_por_ids.png)
 
 ## 3. Estatística por cenário e IDS (repetições, IC 95% de Wilson)
 
 | Cenário | Classe | IDS | n | Taxa detec. | IC95 | Erro classif. | FN puro | FP |
 |---|---|---|--:|--:|:--:|--:|--:|--:|
-| benigno-dns | benigno | snort | 7 | — | — | — | — | 0.000 |
-| benigno-dns | benigno | suricata | 7 | — | — | — | — | 0.000 |
-| benigno-dns | benigno | zeek | 7 | — | — | — | — | 0.000 |
-| benigno-http | benigno | snort | 8 | — | — | — | — | 0.000 |
-| benigno-http | benigno | suricata | 8 | — | — | — | — | 0.000 |
-| benigno-http | benigno | zeek | 8 | — | — | — | — | 0.125 |
-| benigno-icmp | benigno | snort | 7 | — | — | — | — | 0.000 |
-| benigno-icmp | benigno | suricata | 7 | — | — | — | — | 0.000 |
-| benigno-icmp | benigno | zeek | 7 | — | — | — | — | 0.000 |
-| benigno-mix | benigno | snort | 12 | — | — | — | — | 0.000 |
-| benigno-mix | benigno | suricata | 12 | — | — | — | — | 0.000 |
-| benigno-mix | benigno | zeek | 12 | — | — | — | — | 0.250 |
-| benigno-scan | benigno | snort | 5 | — | — | — | — | 0.000 |
-| benigno-scan | benigno | suricata | 5 | — | — | — | — | 0.000 |
-| benigno-scan | benigno | zeek | 5 | — | — | — | — | 0.400 |
-| benigno-ssh | benigno | snort | 8 | — | — | — | — | 0.000 |
-| benigno-ssh | benigno | suricata | 8 | — | — | — | — | 0.000 |
-| benigno-ssh | benigno | zeek | 8 | — | — | — | — | 0.000 |
-| dns-tunneling | malicioso | snort | 7 | 0.286 | [0.082, 0.641] | 0.000 | 0.714 | — |
-| dns-tunneling | malicioso | suricata | 7 | 1.000 | [0.646, 1.000] | 0.000 | 0.000 | — |
-| dns-tunneling | malicioso | zeek | 7 | 0.714 | [0.359, 0.918] | 0.000 | 0.286 | — |
-| dos-http-simple | malicioso | snort | 6 | 0.333 | [0.097, 0.700] | 0.000 | 0.667 | — |
-| dos-http-simple | malicioso | suricata | 6 | 0.833 | [0.436, 0.970] | 0.167 | 0.000 | — |
-| dos-http-simple | malicioso | zeek | 6 | 0.000 | [0.000, 0.390] | 0.333 | 0.667 | — |
-| icmp-flood | malicioso | snort | 4 | 1.000 | [0.510, 1.000] | 0.000 | 0.000 | — |
-| icmp-flood | malicioso | suricata | 4 | 1.000 | [0.510, 1.000] | 0.000 | 0.000 | — |
-| icmp-flood | malicioso | zeek | 4 | 0.000 | [0.000, 0.490] | 0.000 | 1.000 | — |
-| idor-path-traversal | malicioso | snort | 8 | 0.000 | [0.000, 0.324] | 1.000 | 0.000 | — |
-| idor-path-traversal | malicioso | suricata | 8 | 0.000 | [0.000, 0.324] | 1.000 | 0.000 | — |
-| idor-path-traversal | malicioso | zeek | 8 | 0.875 | [0.529, 0.978] | 0.000 | 0.125 | — |
-| port-scanner-tcp | malicioso | snort | 5 | 0.000 | [0.000, 0.434] | 0.000 | 1.000 | — |
-| port-scanner-tcp | malicioso | suricata | 5 | 0.000 | [0.000, 0.434] | 0.000 | 1.000 | — |
-| port-scanner-tcp | malicioso | zeek | 5 | 1.000 | [0.566, 1.000] | 0.000 | 0.000 | — |
-| sql-injection | malicioso | snort | 10 | 0.000 | [0.000, 0.278] | 1.000 | 0.000 | — |
-| sql-injection | malicioso | suricata | 10 | 1.000 | [0.722, 1.000] | 0.000 | 0.000 | — |
-| sql-injection | malicioso | zeek | 10 | 0.900 | [0.596, 0.982] | 0.000 | 0.100 | — |
-| ssh-bruteforce | malicioso | snort | 8 | 0.000 | [0.000, 0.324] | 0.000 | 1.000 | — |
-| ssh-bruteforce | malicioso | suricata | 8 | 0.000 | [0.000, 0.324] | 0.000 | 1.000 | — |
-| ssh-bruteforce | malicioso | zeek | 8 | 0.000 | [0.000, 0.324] | 0.125 | 0.875 | — |
-| syn-flood | malicioso | snort | 9 | 1.000 | [0.701, 1.000] | 0.000 | 0.000 | — |
-| syn-flood | malicioso | suricata | 9 | 1.000 | [0.701, 1.000] | 0.000 | 0.000 | — |
-| syn-flood | malicioso | zeek | 9 | 0.444 | [0.189, 0.733] | 0.333 | 0.222 | — |
-| udp-flood | malicioso | snort | 4 | 1.000 | [0.510, 1.000] | 0.000 | 0.000 | — |
-| udp-flood | malicioso | suricata | 4 | 1.000 | [0.510, 1.000] | 0.000 | 0.000 | — |
-| udp-flood | malicioso | zeek | 4 | 0.500 | [0.150, 0.850] | 0.000 | 0.500 | — |
-| xss-scanner | malicioso | snort | 10 | 1.000 | [0.722, 1.000] | 0.000 | 0.000 | — |
-| xss-scanner | malicioso | suricata | 10 | 1.000 | [0.722, 1.000] | 0.000 | 0.000 | — |
-| xss-scanner | malicioso | zeek | 10 | 0.400 | [0.168, 0.687] | 0.000 | 0.600 | — |
+| benigno-dns | benigno | snort | 15 | — | — | — | — | 0.000 |
+| benigno-dns | benigno | suricata | 15 | — | — | — | — | 0.000 |
+| benigno-dns | benigno | zeek | 15 | — | — | — | — | 0.067 |
+| benigno-http | benigno | snort | 15 | — | — | — | — | 0.000 |
+| benigno-http | benigno | suricata | 15 | — | — | — | — | 0.000 |
+| benigno-http | benigno | zeek | 15 | — | — | — | — | 0.067 |
+| benigno-icmp | benigno | snort | 15 | — | — | — | — | 0.000 |
+| benigno-icmp | benigno | suricata | 15 | — | — | — | — | 0.000 |
+| benigno-icmp | benigno | zeek | 15 | — | — | — | — | 0.067 |
+| benigno-mix | benigno | snort | 15 | — | — | — | — | 0.000 |
+| benigno-mix | benigno | suricata | 15 | — | — | — | — | 0.000 |
+| benigno-mix | benigno | zeek | 15 | — | — | — | — | 0.200 |
+| benigno-scan | benigno | snort | 15 | — | — | — | — | 0.000 |
+| benigno-scan | benigno | suricata | 15 | — | — | — | — | 0.000 |
+| benigno-scan | benigno | zeek | 15 | — | — | — | — | 0.133 |
+| benigno-ssh | benigno | snort | 15 | — | — | — | — | 0.000 |
+| benigno-ssh | benigno | suricata | 15 | — | — | — | — | 0.000 |
+| benigno-ssh | benigno | zeek | 15 | — | — | — | — | 0.000 |
+| dns-tunneling | malicioso | snort | 15 | 0.267 | [0.109, 0.520] | 0.000 | 0.733 | — |
+| dns-tunneling | malicioso | suricata | 15 | 1.000 | [0.796, 1.000] | 0.000 | 0.000 | — |
+| dns-tunneling | malicioso | zeek | 15 | 0.667 | [0.417, 0.848] | 0.000 | 0.333 | — |
+| dos-http-simple | malicioso | snort | 15 | 0.333 | [0.152, 0.583] | 0.000 | 0.667 | — |
+| dos-http-simple | malicioso | suricata | 15 | 0.733 | [0.480, 0.891] | 0.267 | 0.000 | — |
+| dos-http-simple | malicioso | zeek | 15 | 0.000 | [0.000, 0.204] | 0.133 | 0.867 | — |
+| icmp-flood | malicioso | snort | 15 | 1.000 | [0.796, 1.000] | 0.000 | 0.000 | — |
+| icmp-flood | malicioso | suricata | 15 | 1.000 | [0.796, 1.000] | 0.000 | 0.000 | — |
+| icmp-flood | malicioso | zeek | 15 | 0.000 | [0.000, 0.204] | 0.067 | 0.933 | — |
+| idor-path-traversal | malicioso | snort | 15 | 0.000 | [0.000, 0.204] | 1.000 | 0.000 | — |
+| idor-path-traversal | malicioso | suricata | 15 | 0.000 | [0.000, 0.204] | 1.000 | 0.000 | — |
+| idor-path-traversal | malicioso | zeek | 15 | 0.667 | [0.417, 0.848] | 0.000 | 0.333 | — |
+| port-scanner-tcp | malicioso | snort | 15 | 0.000 | [0.000, 0.204] | 0.000 | 1.000 | — |
+| port-scanner-tcp | malicioso | suricata | 15 | 0.000 | [0.000, 0.204] | 0.000 | 1.000 | — |
+| port-scanner-tcp | malicioso | zeek | 15 | 0.733 | [0.480, 0.891] | 0.000 | 0.267 | — |
+| sql-injection | malicioso | snort | 15 | 0.000 | [0.000, 0.204] | 1.000 | 0.000 | — |
+| sql-injection | malicioso | suricata | 15 | 1.000 | [0.796, 1.000] | 0.000 | 0.000 | — |
+| sql-injection | malicioso | zeek | 15 | 0.733 | [0.480, 0.891] | 0.000 | 0.267 | — |
+| ssh-bruteforce | malicioso | snort | 15 | 0.000 | [0.000, 0.204] | 0.000 | 1.000 | — |
+| ssh-bruteforce | malicioso | suricata | 15 | 0.000 | [0.000, 0.204] | 0.000 | 1.000 | — |
+| ssh-bruteforce | malicioso | zeek | 15 | 0.000 | [0.000, 0.204] | 0.067 | 0.933 | — |
+| syn-flood | malicioso | snort | 15 | 1.000 | [0.796, 1.000] | 0.000 | 0.000 | — |
+| syn-flood | malicioso | suricata | 15 | 1.000 | [0.796, 1.000] | 0.000 | 0.000 | — |
+| syn-flood | malicioso | zeek | 15 | 0.333 | [0.152, 0.583] | 0.267 | 0.400 | — |
+| udp-flood | malicioso | snort | 15 | 1.000 | [0.796, 1.000] | 0.000 | 0.000 | — |
+| udp-flood | malicioso | suricata | 15 | 1.000 | [0.796, 1.000] | 0.000 | 0.000 | — |
+| udp-flood | malicioso | zeek | 15 | 0.467 | [0.248, 0.699] | 0.000 | 0.533 | — |
+| xss-scanner | malicioso | snort | 15 | 1.000 | [0.796, 1.000] | 0.000 | 0.000 | — |
+| xss-scanner | malicioso | suricata | 15 | 1.000 | [0.796, 1.000] | 0.000 | 0.000 | — |
+| xss-scanner | malicioso | zeek | 15 | 0.400 | [0.198, 0.643] | 0.000 | 0.600 | — |
+
+![Taxa de detecção por cenário (orquestração, IC 95%)](graficos/deteccao_por_cenario.png)
 
 ## 4. Erros de classificação (detecção com assinatura errada)
 
 Casos em que o IDS **detectou** o ataque mas atribuiu assinatura de **outra família** (ex.: flood classificado como SQLi). Não é falso negativo (houve detecção) nem falso positivo. Tratado como categoria própria.
+
+![Matriz de confusão (intencionada × prevista)](graficos/matriz_confusao.png)
+
+![Erros de classificação por par](graficos/erros_classificacao.png)
 
 | Cenário | IDS | Família correta | Classificada como | Janela |
 |---|---|---|---|---|
@@ -161,21 +182,45 @@ Casos em que o IDS **detectou** o ataque mas atribuiu assinatura de **outra fam�
 | dos-http-simple | zeek | dos-http | scan | campanha02-dos-http-simple-malicioso-r13 |
 | sql-injection | snort | sqli | xss | campanha02-sql-injection-malicioso-r11 |
 | ssh-bruteforce | zeek | ssh-brute | scan | campanha02-ssh-bruteforce-malicioso-r01 |
+| sql-injection | snort | sqli | xss | campanha02-sql-injection-malicioso-r10 |
+| sql-injection | snort | sqli | xss | campanha02-sql-injection-malicioso-r02 |
+| idor-path-traversal | suricata | path-traversal | dos-http | campanha02-idor-path-traversal-malicioso-r09 |
+| idor-path-traversal | snort | path-traversal | dos-http | campanha02-idor-path-traversal-malicioso-r09 |
+| syn-flood | zeek | flood-syn | scan | campanha02-syn-flood-malicioso-r14 |
+| idor-path-traversal | suricata | path-traversal | dos-http | campanha02-idor-path-traversal-malicioso-r13 |
+| idor-path-traversal | snort | path-traversal | dos-http | campanha02-idor-path-traversal-malicioso-r13 |
+| dos-http-simple | suricata | dos-http | flood-syn | campanha02-dos-http-simple-malicioso-r07 |
+| idor-path-traversal | suricata | path-traversal | dos-http | campanha02-idor-path-traversal-malicioso-r06 |
+| idor-path-traversal | snort | path-traversal | dos-http | campanha02-idor-path-traversal-malicioso-r06 |
+| icmp-flood | zeek | flood-icmp | scan | campanha02-icmp-flood-malicioso-r10 |
+| dos-http-simple | suricata | dos-http | flood-syn | campanha02-dos-http-simple-malicioso-r14 |
+| dos-http-simple | suricata | dos-http | flood-syn | campanha02-dos-http-simple-malicioso-r10 |
+| idor-path-traversal | suricata | path-traversal | dos-http | campanha02-idor-path-traversal-malicioso-r01 |
+| idor-path-traversal | snort | path-traversal | dos-http | campanha02-idor-path-traversal-malicioso-r01 |
+| sql-injection | snort | sqli | xss | campanha02-sql-injection-malicioso-r07 |
+| sql-injection | snort | sqli | xss | campanha02-sql-injection-malicioso-r09 |
+| idor-path-traversal | suricata | path-traversal | dos-http | campanha02-idor-path-traversal-malicioso-r08 |
+| idor-path-traversal | snort | path-traversal | dos-http | campanha02-idor-path-traversal-malicioso-r08 |
+| idor-path-traversal | suricata | path-traversal | dos-http | campanha02-idor-path-traversal-malicioso-r03 |
+| idor-path-traversal | snort | path-traversal | dos-http | campanha02-idor-path-traversal-malicioso-r03 |
+| idor-path-traversal | suricata | path-traversal | dos-http | campanha02-idor-path-traversal-malicioso-r04 |
+| idor-path-traversal | snort | path-traversal | dos-http | campanha02-idor-path-traversal-malicioso-r04 |
+| sql-injection | snort | sqli | xss | campanha02-sql-injection-malicioso-r08 |
 
 ### Matriz de confusão (família intencionada × prevista, janelas maliciosas)
 
 | intencionada\prevista | NENHUM | dns-tunneling | dos-http | flood-icmp | flood-syn | flood-udp | path-traversal | scan | sqli | xss |
 |---|---|---|---|---|---|---|---|---|---|---|
-| dns-tunneling | 7 | 14 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| dos-http | 8 | 0 | 7 | 1 | 1 | 0 | 0 | 1 | 0 | 0 |
-| flood-icmp | 4 | 0 | 0 | 8 | 0 | 0 | 0 | 0 | 0 | 0 |
-| flood-syn | 2 | 0 | 0 | 0 | 22 | 0 | 0 | 3 | 0 | 0 |
-| flood-udp | 2 | 0 | 0 | 0 | 0 | 10 | 0 | 0 | 0 | 0 |
-| path-traversal | 1 | 0 | 16 | 0 | 0 | 0 | 7 | 0 | 0 | 0 |
-| scan | 10 | 0 | 0 | 0 | 0 | 0 | 0 | 5 | 0 | 0 |
-| sqli | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 19 | 10 |
-| ssh-brute | 23 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 |
-| xss | 6 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 24 |
+| dns-tunneling | 16 | 29 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| dos-http | 23 | 0 | 16 | 1 | 4 | 0 | 0 | 1 | 0 | 0 |
+| flood-icmp | 14 | 0 | 0 | 30 | 0 | 0 | 0 | 1 | 0 | 0 |
+| flood-syn | 6 | 0 | 0 | 0 | 35 | 0 | 0 | 4 | 0 | 0 |
+| flood-udp | 8 | 0 | 0 | 0 | 0 | 37 | 0 | 0 | 0 | 0 |
+| path-traversal | 5 | 0 | 30 | 0 | 0 | 0 | 10 | 0 | 0 | 0 |
+| scan | 34 | 0 | 0 | 0 | 0 | 0 | 0 | 11 | 0 | 0 |
+| sqli | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 26 | 15 |
+| ssh-brute | 44 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 |
+| xss | 9 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 36 |
 
 ## 5. Falsos positivos no tráfego benigno
 
@@ -187,14 +232,16 @@ Casos em que o IDS **detectou** o ataque mas atribuiu assinatura de **outra fam�
 | benigno-mix | zeek | scan | campanha02-benigno-mix-benigno-r01 |
 | benigno-mix | zeek | scan | campanha02-benigno-mix-benigno-r08 |
 | benigno-mix | zeek | scan | campanha02-benigno-mix-benigno-r15 |
+| benigno-icmp | zeek | scan | campanha02-benigno-icmp-benigno-r11 |
+| benigno-dns | zeek | flood-icmp | campanha02-benigno-dns-benigno-r06 |
 
 ## 6. Síntese por questão de pesquisa
 
-- **RQ1 — Eficácia por IDS.** Recall (detecção família-correta): Suricata 0.690, Snort 0.437, Zeek 0.507; orquestração 0.859.
-- **RQ2 — Piores falsos negativos.** Cenários não detectados por nenhum IDS (sem cobertura efetiva): ssh-bruteforce.
-- **RQ3 — Falsos positivos (tráfego benigno).** 6 janela(s) benigna(s) com alerta indevido (cenários: benigno-http, benigno-mix, benigno-scan). FP por IDS: Suricata 0, Snort 0, Zeek 6.
-- **RQ4 — Orquestração.** Recall combinado 0.859 vs. melhor IDS isolado 0.690 → ganho de +0.169. Combinar os três aumenta a cobertura.
-- **RQ5 — Regras problemáticas / erro de classificação.** 33 janela(s) com detecção de família errada. Pares observados: dos-http→flood-icmp (zeek); dos-http→flood-syn (suricata); dos-http→scan (zeek); flood-syn→scan (zeek); path-traversal→dos-http (snort); path-traversal→dos-http (suricata); sqli→xss (snort); ssh-brute→scan (zeek). Ver §4 e a matriz de confusão.
+- **RQ1 — Eficácia por IDS.** Recall (detecção família-correta): Suricata 0.673, Snort 0.460, Zeek 0.400; orquestração 0.813.
+- **RQ2 — Piores falsos negativos.** Cenários não detectados por nenhum IDS (sem cobertura efetiva): port-scanner-tcp, ssh-bruteforce.
+- **RQ3 — Falsos positivos (tráfego benigno).** 8 janela(s) benigna(s) com alerta indevido (cenários: benigno-dns, benigno-http, benigno-icmp, benigno-mix, benigno-scan). FP por IDS: Suricata 0, Snort 0, Zeek 8.
+- **RQ4 — Orquestração.** Recall combinado 0.813 vs. melhor IDS isolado 0.673 → ganho de +0.140. Combinar os três aumenta a cobertura.
+- **RQ5 — Regras problemáticas / erro de classificação.** 57 janela(s) com detecção de família errada. Pares observados: dos-http→flood-icmp (zeek); dos-http→flood-syn (suricata); dos-http→scan (zeek); flood-icmp→scan (zeek); flood-syn→scan (zeek); path-traversal→dos-http (snort); path-traversal→dos-http (suricata); sqli→xss (snort); ssh-brute→scan (zeek). Ver §4 e a matriz de confusão.
 
 ---
 _Gerado por gera_relatorio.py (campanha02)._

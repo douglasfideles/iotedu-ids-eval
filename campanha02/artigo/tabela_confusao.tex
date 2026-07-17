@@ -1,0 +1,21 @@
+\begin{table*}[t]\centering
+\caption{Matriz de confus\~ao (fam\'ilia intencionada $\times$ fam\'ilia prevista) nas janelas maliciosas, somada nos 3 IDS. NENHUM = sem detec\c{c}\~ao.}
+\label{tab:confusao}
+\footnotesize
+\begin{tabular}{lrrrrrrrrrr}
+\toprule
+Intencionada & NENHUM & dns-tunneling & dos-http & flood-icmp & flood-syn & flood-udp & path-traversal & scan & sqli & xss \\
+\midrule
+dns-tunneling & 16 & 29 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+dos-http & 23 & 0 & 16 & 1 & 4 & 0 & 0 & 1 & 0 & 0 \\
+flood-icmp & 14 & 0 & 0 & 30 & 0 & 0 & 0 & 1 & 0 & 0 \\
+flood-syn & 6 & 0 & 0 & 0 & 35 & 0 & 0 & 4 & 0 & 0 \\
+flood-udp & 8 & 0 & 0 & 0 & 0 & 37 & 0 & 0 & 0 & 0 \\
+path-traversal & 5 & 0 & 30 & 0 & 0 & 0 & 10 & 0 & 0 & 0 \\
+scan & 34 & 0 & 0 & 0 & 0 & 0 & 0 & 11 & 0 & 0 \\
+sqli & 4 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 26 & 15 \\
+ssh-brute & 44 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+xss & 9 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 36 \\
+\bottomrule
+\end{tabular}
+\end{table*}

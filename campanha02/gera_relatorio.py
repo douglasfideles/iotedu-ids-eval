@@ -251,6 +251,46 @@ def main():
              f"detecção de família errada. Pares observados: "
              f"{'; '.join(pares) if pares else 'nenhum'}. Ver §4 e a matriz de confusão.")
     L.append("")
+
+    # ---- 7. Recomendações de ajuste de regras (fundamentadas nos achados) ----
+    L.append("## 7. Recomendações de ajuste de regras\n")
+    L.append("Baseadas nos falsos negativos, falsos positivos e erros de classificação "
+             "observados; cada item cita a causa-raiz na regra.\n")
+    L.append("1. **SSH brute-force (FN quase total) — porta errada.** As regras "
+             "`brute-force-ssh` vigiam a **porta 2222** (porta publicada no host), mas o "
+             "servidor-alvo escuta na **porta 22** nativa do container, que é o que trafega na "
+             "bridge farejada. Resultado: nenhuma regra casa. **Ajuste:** apontar as regras para "
+             "`22` (ou `[22,2222]`); o mesmo vale para Telnet (`23` vs `2323`). Alternativa: "
+             "atacar as portas publicadas no host. (O HTTP funcionou porque a porta 80 do "
+             "container coincide com `$HTTP_PORTS`.)")
+    L.append("2. **`sqli → xss` (erro de classificação, Snort) — regra de XSS genérica demais.** "
+             "A regra *XSS (Scanner Alta Frequência)* (sid 1000049) dispara com "
+             "`http_uri; content:\"<\"; detection_filter count 30/10s` — ou seja, **qualquer** "
+             "rajada de requisições contendo `<` na URI. Os payloads do `sqlmap --level=3` "
+             "contêm `<` e alto volume, disparando XSS antes/no lugar de SQLi. **Ajuste:** exigir "
+             "um token XSS real (`<script`, `<svg`, `onerror=`, `javascript:`) em vez de `<` "
+             "isolado, ou remover o gatilho puramente por taxa.")
+    L.append("3. **`path-traversal → dos-http` (erro de classificação) — limiar de DoS pega o "
+             "fuzzing.** O `ffuf` varre a wordlist em alta taxa e cruza os limiares de "
+             "`dos-http` (ex.: *Excessive GETs* 100/5s, *DoS GET Flood* 50/5s), enquanto as "
+             "regras de conteúdo de path-traversal casam em poucas janelas. **Ajuste:** dar "
+             "prioridade/abrangência às assinaturas de conteúdo (`../`, `%2e%2e`, `/etc/passwd` "
+             "com codificações) e elevar os limiares de DoS para exigir volume sustentado.")
+    L.append("4. **Port scan TCP (FN alto) — falta regra dedicada.** Não há assinatura de "
+             "*port scan* por conexão TCP; a varredura do `nmap -sT` só é (parcialmente) pega "
+             "pelo Zeek. **Ajuste:** adicionar regra de scan (ex.: `detection_filter` de SYNs a "
+             "múltiplas portas distintas por origem) ou habilitar detector de scan.")
+    L.append("5. **Falsos positivos do Zeek (8 janelas) — limiares de scan/ICMP sensíveis.** "
+             "Tráfego benigno (curl/nping em baixa taxa) foi rotulado como *scan* ou "
+             "*flood-icmp*. **Ajuste:** elevar os limiares das políticas de Scan e de ICMP do "
+             "Zeek (contagem/intervalo) para não alertar em uso legítimo esporádico.")
+    L.append("6. **DNS tunneling (parcial) — limiar/entropia.** Detectado em parte das janelas; "
+             "as demais não cruzaram o limiar. **Ajuste:** reduzir o limiar de taxa e/ou somar "
+             "verificação de entropia/comprimento do subdomínio.")
+    L.append("\n> Todos os ajustes devem ser revalidados nesta mesma bancada (a ferramenta "
+             "`rodar-campanha.sh` reexecuta a campanha e regenera métricas + figuras), "
+             "preservando o *freeze* de regras/imagens em `regras/hashes.txt` como linha de base.\n")
+
     L.append("---")
     L.append("_Gerado por gera_relatorio.py (campanha02)._")
     open(saida, "w", encoding="utf-8").write("\n".join(L) + "\n")

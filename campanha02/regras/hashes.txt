@@ -1,4 +1,4 @@
-# hashes.txt — campanha02 — 2026-07-17T01:28:17.700Z
+# hashes.txt — campanha02 — 2026-07-17T10:52:23.817Z
 ## regras snort
 b76b2ff05933691cb782dd1aaa319d25b2bc01a38818f6a24bafdff054e98561  /mnt/d/PROJETOS/react/Git/mvpv1-snapshot/ids/rules/rules_snort/all.rules
 ef15146312993f8244c22a0e9cb68099bd76cf4bf866f33d080ccc537b7378ed  /mnt/d/PROJETOS/react/Git/mvpv1-snapshot/ids/rules/rules_snort/brute-force-ssh.rules
@@ -81,13 +81,13 @@ fd9ab73864674b4104ff75534b694062a9dd5b1e22a6ccccd09eb7587fa154ae  /mnt/d/PROJETO
 [sbcup26-ataque-icmp-flood:latest] sha256:9f780ce25c2af3a1f11b4e5bccc89b6b7fce76a1270bf74eb9881f2cbf884514
 [sbcup26-ataque-ssh-bruteforce:latest] sha256:c6bba0fe86e9ec073804b873bde3a73ac4e5f98f172855c9f78476a23ad97441
 [sbcup26-ataque-sql-injection:latest] sha256:43e69f448848f8ec465ab418cd051d874eb71f54a725f5f9581899c40a62be58
-[sbcup26-ataque-xss-scanner:latest] sha256:d3f53b376b2092a32d48d1694f5344dd715ebd3c85c2f07485b8d1c9a2080bd8
+[sbcup26-ataque-xss-scanner:latest] sha256:c38ef660dae0f8bcd5f9f8ec38409debebf84228cae7f25110811a6c830b1090
 [sbcup26-ataque-dos-http-simple:latest] sha256:dee54c86e9bef6b46b55926c238f1b5256875760c4f6931022087229265d70e2
 [iotedu-lab:latest] sha256:599f98c5543ad52fbedbec10a178673f4cd1b86b58d2f144a8117b62bc68ad1c
 ## scripts campanha02
-69c02d7cb2210c4ed0c55a99b76bead6d3f87fe386aced7a3f75019a1d2b1f31  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/benigno.sh
-57f5e8f4330d2e062baf03979de2bc8739361d5a2ab73679741b9edc06181109  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/classificar.py
+4987e11f1e43828f5b42849c58cbaf63db067f1163a1e6bb0b8903b87a4f2ab4  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/benigno.sh
+f5e8005b02a894d2016e6b0f0443da47a76dede387e9d8940fefbfd2adf272d6  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/classificar.py
 798475d4b0af703f3455a57d9c2ee4c8f3ad01bec7c86d82774b36a8ff2fb386  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/estatistica.py
 5c0e59856c9a59db608632f14fdcdb66cbc78850ffd4f34a89761669326287e5  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/gera_relatorio.py
 936357a5f7087026c3f8461a9384d7945d39f8dfa4bee3ccdffa2b15c95b78b5  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/mapa-assinaturas.yaml
-a3cea1e601f2701b0d597ad33f5de0f415e62c5d44193b2db56da6cf3a1a666f  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/rodar-campanha.sh
+798c5a6dad717f213b538aa0f8ff949050cf6038d7c568c7ed3987bf8cdfe1c7  /mnt/d/PROJETOS/react/Git/iotedu-ids-eval/campanha02/rodar-campanha.sh

@@ -1,0 +1,11 @@
+execucao_id: campanha02-benigno-scan-benigno-r14
+cenario: benigno-scan
+classe: benigno
+familia_intencionada: scan
+attacker_ip: 172.30.0.20
+flush_ip: 172.30.0.250
+interface: br-828636aac1f5
+t_start: 2026-07-17T12:28:21.539Z
+t_end: 2026-07-17T12:30:26.858Z
+gerador_rc: 0
+pcap_pacotes: 177

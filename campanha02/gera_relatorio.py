@@ -61,6 +61,45 @@ def main():
     L.append("Ataques gerados a partir de `sbcup2026-ataques` contra alvos leves numa rede "
              "docker farejada pelos 3 IDS (Suricata, Snort, Zeek). **Sem a aplicação IoTEdu** "
              "— avaliação de como as regras se comportam diante do tráfego capturado.\n")
+
+    # ---- 0. Metodologia / detalhes do experimento (estático) ----
+    L.append("## 0. Metodologia e detalhes do experimento\n")
+    L.append("**Objetivo.** Medir a eficácia de detecção dos IDS (e da orquestração dos três) "
+             "frente a tráfego malicioso e benigno numa interface de rede, avaliando também "
+             "falsos positivos e **erros de classificação** (detecção com assinatura de família errada).\n")
+    L.append("**Topologia.** Rede docker dedicada `ids-eval-net` (172.30.0.0/24) farejada pela "
+             "bridge `br-<netid>`. Na mesma rede: alvos leves (HTTP `172.30.0.5:80`, SSH "
+             "`172.30.0.6:22`), o atacante (`172.30.0.10`), o gerador benigno (`172.30.0.20`) e "
+             "um IP de *flush* descartável (`172.30.0.250`, nunca contado). Os IDS rodam em "
+             "`network_mode: host` (Suricata/Snort/Zeek do `mvpv1-snapshot`), recriados com "
+             "`--force-recreate` (nunca `restart`). **A aplicação IoTEdu (back/front) não é usada.**\n")
+    L.append("**Unidade de análise.** A *janela rotulada*: uma execução isolada de UM cenário "
+             "(malicioso ou benigno), sem tráfego concorrente. Por janela salvam-se as fatias de "
+             "alertas de cada IDS (por *byte-offset* + filtro de *timestamp*, que remove notices do "
+             "Zeek escritos em lote e evita vazamento entre janelas), o PCAP, o stdout do gerador e um manifesto.\n")
+    L.append("**Os 10 ataques (família intencionada) e os 6 cenários benignos:**\n")
+    L.append("| Ataque (sbcup26) | Família | Alvo | | Benigno | Tráfego legítimo |")
+    L.append("|---|---|---|---|---|---|")
+    L.append("| icmp-flood | flood-icmp | .5 | | benigno-icmp | ping baixa taxa |")
+    L.append("| syn-flood | flood-syn | .5:80 | | benigno-http | GETs HTTP normais |")
+    L.append("| udp-flood | flood-udp | .5:80 | | benigno-dns | consultas DNS legítimas |")
+    L.append("| dos-http-simple | dos-http | .5:80 | | benigno-ssh | conexões SSH pontuais |")
+    L.append("| sql-injection | sqli | .5:80 | | benigno-scan | acesso normal a 1 serviço |")
+    L.append("| xss-scanner | xss | .5:80 | | benigno-mix | HTTP+DNS+ICMP+SSH leves |")
+    L.append("| idor-path-traversal | path-traversal | .5:80 | | | |")
+    L.append("| port-scanner-tcp | scan | .5 | | | |")
+    L.append("| ssh-bruteforce | ssh-brute | .6:22 | | | |")
+    L.append("| dns-tunneling | dns-tunneling | resolvers públicos | | | |")
+    L.append("")
+    L.append("**Classificação por janela e IDS.** `TP` = ≥1 alerta da família correta; "
+             "`FN_PURO` = nenhum alerta de ataque; `ERRO_CLASSIF` = detectou, mas só com "
+             "assinatura de **outra** família (nem TP, nem FN puro); `FP` = janela benigna com "
+             "qualquer alerta de ataque; `TN` = benigna sem alerta. A rajada de *flush* e alertas "
+             "fora do intervalo da janela são descartados.\n")
+    L.append("**Métricas.** Precisão, Recall (sensibilidade), Especificidade, F1, FPR, FNR, "
+             "acurácia balanceada — por IDS e para a **orquestração** (detecta se qualquer IDS "
+             "detecta). Denominador zero ⇒ métrica indefinida (nunca forçada a 0). As repetições "
+             "são agregadas com **intervalo de confiança de Wilson 95%**.\n")
     L.append("## 1. Resumo da captura\n")
     L.append(f"- **Janelas avaliadas:** {len(janelas)} "
              f"({n_por_classe['malicioso']} maliciosas, {n_por_classe['benigno']} benignas)")
@@ -153,6 +192,49 @@ def main():
             L.append(f"| {d['cenario']} | {d['ids']} | {d['familia_prevista']} | {d['execucao_id']} |")
     else:
         L.append("Nenhum falso positivo observado no tráfego benigno. ✅")
+    L.append("")
+
+    # ---- 6. Síntese por questão de pesquisa (data-driven) ----
+    L.append("## 6. Síntese por questão de pesquisa\n")
+    mby = {m["subject"]: m for m in metricas} if metricas else {}
+    def rec(s): return mby.get(s, {}).get("recall", "—")
+    def fp(s):  return mby.get(s, {}).get("FP", "—")
+    L.append(f"- **RQ1 — Eficácia por IDS.** Recall (detecção família-correta): "
+             f"Suricata {rec('suricata')}, Snort {rec('snort')}, Zeek {rec('zeek')}; "
+             f"orquestração {rec('orquestracao')}.")
+    # RQ2: cenários maliciosos com FN em TODOS os IDS
+    mal = [d for d in detalhe if d["classe"].startswith("malic")]
+    cen_ids = defaultdict(set)
+    for d in mal:
+        if d["rotulo"] in ("FN_PURO",):
+            cen_ids[d["cenario"]].add(d["ids"])
+    tot_ids = len({d["ids"] for d in detalhe}) or 3
+    piores = sorted([c for c, s in cen_ids.items() if len(s) >= tot_ids])
+    L.append(f"- **RQ2 — Piores falsos negativos.** Cenários não detectados por nenhum IDS "
+             f"(sem cobertura efetiva): {', '.join(piores) if piores else 'nenhum'}.")
+    # RQ3: FP
+    total_fp = sum(1 for d in detalhe if d["rotulo"] == "FP")
+    ben_fp = sorted({d["cenario"] for d in detalhe if d["rotulo"] == "FP"})
+    L.append(f"- **RQ3 — Falsos positivos (tráfego benigno).** {total_fp} janela(s) benigna(s) "
+             f"com alerta indevido"
+             + (f" (cenários: {', '.join(ben_fp)}). " if ben_fp else ". ")
+             + f"FP por IDS: Suricata {fp('suricata')}, Snort {fp('snort')}, Zeek {fp('zeek')}.")
+    # RQ4: ganho da orquestração
+    try:
+        best = max(float(mby[s]["recall"]) for s in ("suricata","snort","zeek") if s in mby)
+        orq = float(mby["orquestracao"]["recall"])
+        L.append(f"- **RQ4 — Orquestração.** Recall combinado {orq:.3f} vs. melhor IDS isolado "
+                 f"{best:.3f} → ganho de {orq-best:+.3f}. Combinar os três "
+                 f"{'aumenta' if orq>best else 'não aumenta'} a cobertura.")
+    except Exception:
+        L.append("- **RQ4 — Orquestração.** (métricas insuficientes)")
+    # RQ5: erros de classificação
+    n_err = sum(1 for d in detalhe if d["rotulo"] == "ERRO_CLASSIF")
+    pares = sorted({f"{d['familia_intencionada']}→{d['familia_prevista']} ({d['ids']})"
+                    for d in detalhe if d["rotulo"] == "ERRO_CLASSIF"})
+    L.append(f"- **RQ5 — Regras problemáticas / erro de classificação.** {n_err} janela(s) com "
+             f"detecção de família errada. Pares observados: "
+             f"{'; '.join(pares) if pares else 'nenhum'}. Ver §4 e a matriz de confusão.")
     L.append("")
     L.append("---")
     L.append("_Gerado por gera_relatorio.py (campanha02)._")

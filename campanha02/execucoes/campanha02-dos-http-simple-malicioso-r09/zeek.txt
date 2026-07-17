@@ -1,0 +1,1 @@
+{"ts":1784287639.530428,"proto":"tcp","note":"DDoS::DoS_Attack_Detected","msg":"[DDOS] [HIGH] Target: [PRIVATE] 172.30.0.5:80 | Type: DoS (single source) | Requests: 100 | Sources: 1","sub":"DoS_single_source","src":"172.30.0.10","dst":"172.30.0.5","p":80,"n":100,"actions":["Notice::ACTION_LOG"],"email_dest":[],"suppress_for":0.0}

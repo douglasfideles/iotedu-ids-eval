@@ -1,0 +1,17 @@
+execucao_id,cenario,familia,classe,attacker_ip,t_start,t_end,suricata,snort,zeek,pcap_pacotes
+campanha02-udp-flood-malicioso-r01,udp-flood,flood-udp,malicioso,172.30.0.10,2026-07-17T10:15:41.270Z,2026-07-17T10:16:33.573Z,32854,18310,8999,237270
+campanha02-ssh-bruteforce-malicioso-r01,ssh-bruteforce,ssh-brute,malicioso,172.30.0.10,2026-07-17T10:16:48.634Z,2026-07-17T10:18:56.577Z,0,0,0,936
+campanha02-port-scanner-tcp-malicioso-r01,port-scanner-tcp,scan,malicioso,172.30.0.10,2026-07-17T10:19:09.273Z,2026-07-17T10:19:32.554Z,0,0,0,2011
+campanha02-dns-tunneling-malicioso-r01,dns-tunneling,dns-tunneling,malicioso,172.30.0.10,2026-07-17T10:19:44.917Z,2026-07-17T10:21:21.336Z,204,0,0,407
+campanha02-benigno-dns-benigno-r01,benigno-dns,dns,benigno,172.30.0.20,2026-07-17T10:21:34.373Z,2026-07-17T10:23:29.974Z,0,0,0,3
+campanha02-benigno-scan-benigno-r01,benigno-scan,scan,benigno,172.30.0.20,2026-07-17T10:23:36.537Z,2026-07-17T10:25:15.451Z,0,0,0,134
+campanha02-benigno-ssh-benigno-r01,benigno-ssh,ssh,benigno,172.30.0.20,2026-07-17T10:25:27.877Z,2026-07-17T10:27:24.530Z,0,0,0,43
+campanha02-idor-path-traversal-malicioso-r01,idor-path-traversal,path-traversal,malicioso,172.30.0.10,2026-07-17T10:27:34.321Z,2026-07-17T10:28:03.621Z,0,0,0,3068
+campanha02-dos-http-simple-malicioso-r01,dos-http-simple,dos-http,malicioso,172.30.0.10,2026-07-17T10:28:16.246Z,2026-07-17T10:29:36.441Z,15,0,0,2005
+campanha02-xss-scanner-malicioso-r01,xss-scanner,xss,malicioso,172.30.0.10,2026-07-17T10:29:48.402Z,2026-07-17T10:30:52.953Z,2,2,0,886
+campanha02-benigno-mix-benigno-r01,benigno-mix,mix,benigno,172.30.0.20,2026-07-17T10:31:06.156Z,2026-07-17T10:33:01.583Z,0,0,0,189
+campanha02-sql-injection-malicioso-r01,sql-injection,sqli,malicioso,172.30.0.10,2026-07-17T10:33:13.967Z,2026-07-17T10:38:06.218Z,2,0,0,10985
+campanha02-benigno-http-benigno-r01,benigno-http,http,benigno,172.30.0.20,2026-07-17T10:38:14.728Z,2026-07-17T10:40:11.200Z,0,0,0,605
+campanha02-syn-flood-malicioso-r01,syn-flood,flood-syn,malicioso,172.30.0.10,2026-07-17T10:40:22.483Z,2026-07-17T10:41:30.273Z,1,241,0,5
+campanha02-benigno-icmp-benigno-r01,benigno-icmp,icmp,benigno,172.30.0.20,2026-07-17T10:41:41.863Z,2026-07-17T10:43:33.629Z,0,0,0,129
+campanha02-icmp-flood-malicioso-r01,icmp-flood,flood-icmp,malicioso,172.30.0.10,2026-07-17T10:43:45.449Z,2026-07-17T10:44:52.170Z,4,7034,0,403429

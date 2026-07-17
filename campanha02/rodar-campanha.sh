@@ -109,11 +109,22 @@ start_targets(){
   docker ps --format '{{.Names}}' | grep -qx c02-http && docker ps --format '{{.Names}}' | grep -qx c02-ssh \
     && log "alvos OK" || { log "ERRO: alvos não subiram"; return 1; }
 }
+trunc_logs(){
+  # baseline limpo: zera os logs dos IDS (offsets ~0, sem backlog de campanhas
+  # anteriores contaminando as janelas). Feito com IDS parados/ao recriar.
+  log "truncando logs dos IDS (baseline limpo)"
+  : > "$SURI" 2>/dev/null; : > "$SNORT" 2>/dev/null; : > "$ZEEK" 2>/dev/null
+  : > "$MVP/ids/logs/logs_suricata/fast.log" 2>/dev/null
+  : > "$MVP/ids/logs/logs_snort/alert_full.txt" 2>/dev/null
+}
 start_ids(){
   local NETID IFACE
   NETID=$(docker network inspect "$NET" -f '{{.Id}}')
   IFACE="br-${NETID:0:12}"
   log "subindo IDS farejando $IFACE (force-recreate; NUNCA restart)"
+  # para os IDS antes de truncar (evita arquivo esparso) e recria FRESCOS
+  docker compose -f "$MVP/docker-compose.yml" --project-directory "$MVP" stop zeek suricata_ids snort_ids >/dev/null 2>&1
+  trunc_logs
   IDS_INTERFACE="$IFACE" docker compose -f "$MVP/docker-compose.yml" --project-directory "$MVP" \
     up -d --force-recreate zeek suricata_ids snort_ids
   sleep 8
@@ -143,26 +154,42 @@ freeze(){
 }
 
 # ---------------- captura de janela ----------------
-# args: id, cenario, classe, familia, attacker_ip, generator_cmd...
+# args: id, cenario, classe, familia, attacker_ip, cname, comando-que-lança-DETACHED...
+# O gerador é lançado DETACHED com nome $cname; a janela espera terminar até TMO
+# segundos e então força a parada (docker kill). NÃO usar 'timeout docker run' —
+# neste setup WSL/Docker Desktop o SIGTERM não para o container (fica órfão).
 janela(){
-  local id="$1" cen="$2" classe="$3" fam="$4" aip="$5"; shift 5
+  local id="$1" cen="$2" classe="$3" fam="$4" aip="$5" cname="$6"; shift 6
   local dir="$EXE/$id"; mkdir -p "$dir"
-  local off_s off_n off_z t0 t1 rc=0 pkts=0 NETID IFACE
+  local off_s off_n off_z t0 t1 rc=0 pkts=0 NETID IFACE tmo waited=0
+  tmo="${TMO_THIS:-$ATTACK_MAX}"
   NETID=$(docker network inspect "$NET" -f '{{.Id}}'); IFACE="br-${NETID:0:12}"
   off_s=$(stat -c%s "$SURI" 2>/dev/null || echo 0)
   off_n=$(stat -c%s "$SNORT" 2>/dev/null || echo 0)
   off_z=$(stat -c%s "$ZEEK" 2>/dev/null || echo 0)
   t0=$(now_utc)
-  # pcap da janela (na bridge, filtrando o IP do gerador)
+  # pcap da janela (na bridge, filtrando o IP do gerador). Anel de ~100MB por
+  # segurança; a CONTAGEM vem do sumário do tcpdump (não relê o arquivo).
   if [ "$PCAP" = 1 ]; then
     docker rm -f "cap_$id" >/dev/null 2>&1
+    # captura tudo na janela EXCETO a rajada de flush (o filtro por IP do atacante
+    # perderia floods com origem SPOOFADA, ex.: syn-flood -> contagem irreal).
     docker run -d --name "cap_$id" --network host --privileged -v "$dir:/cap" "$LAB" \
-      tcpdump -i "$IFACE" -n -s "$SNAP" -U host "$aip" -w /cap/trafego.pcap >/dev/null 2>&1
+      tcpdump -i "$IFACE" -n -s "$SNAP" -U -C 100 -W 1 not host "$FLUSH_IP" -w /cap/trafego.pcap >/dev/null 2>&1
+    sleep 1
   fi
-  # gerador (ataque ou benigno) — foreground, com teto de tempo (TMO por cenário)
-  log "  janela $id ($classe/$cen) gerando (teto ${TMO_THIS:-$ATTACK_MAX}s)..."
-  timeout "${TMO_THIS:-$ATTACK_MAX}" "$@" > "$dir/gerador.stdout" 2>&1; rc=$?
-  docker rm -f c02-atk "c02-benigno-${cen#benigno-}" >/dev/null 2>&1
+  # lança o gerador DETACHED e espera terminar até 'tmo' segundos
+  log "  janela $id ($classe/$cen) gerando (teto ${tmo}s)..."
+  docker rm -f "$cname" >/dev/null 2>&1
+  "$@" >/dev/null 2>&1
+  while [ "$waited" -lt "$tmo" ]; do
+    docker ps --format '{{.Names}}' | grep -qx "$cname" || break
+    sleep 3; waited=$((waited+3))
+  done
+  docker logs "$cname" > "$dir/gerador.stdout" 2>&1 || :
+  rc=$(docker inspect -f '{{.State.ExitCode}}' "$cname" 2>/dev/null || echo 124)
+  if docker ps --format '{{.Names}}' | grep -qx "$cname"; then rc=124; docker kill "$cname" >/dev/null 2>&1; fi
+  docker rm -f "$cname" >/dev/null 2>&1
   # flush do buffer dos IDS (rajada de IP descartável — excluída na análise)
   if [ "$FLUSH" = 1 ]; then
     docker run --rm --network "$NET" --ip "$FLUSH_IP" --cap-add=NET_RAW --cap-add=NET_ADMIN \
@@ -174,11 +201,12 @@ janela(){
   tail -c +$((off_s+1)) "$SURI"  2>/dev/null | grep '"event_type":"alert"' > "$dir/suricata.jsonl" 2>/dev/null || : > "$dir/suricata.jsonl"
   tail -c +$((off_n+1)) "$SNORT" 2>/dev/null > "$dir/snort.txt"   || : > "$dir/snort.txt"
   tail -c +$((off_z+1)) "$ZEEK"  2>/dev/null > "$dir/zeek.txt"    || : > "$dir/zeek.txt"
-  # encerra pcap e conta pacotes
+  # encerra pcap; contagem via sumário do tcpdump (packets received by filter)
   if [ "$PCAP" = 1 ]; then
-    docker stop "cap_$id" >/dev/null 2>&1; docker rm -f "cap_$id" >/dev/null 2>&1
-    pkts=$(docker run --rm -v "$dir:/cap" "$LAB" sh -c 'tcpdump -r /cap/trafego.pcap 2>/dev/null | wc -l' 2>/dev/null | tr -d ' ')
+    docker stop -t 3 "cap_$id" >/dev/null 2>&1
+    pkts=$(docker logs "cap_$id" 2>&1 | grep -oE '[0-9]+ packets received by filter' | grep -oE '^[0-9]+' | tail -1)
     [ -z "$pkts" ] && pkts=0
+    docker rm -f "cap_$id" >/dev/null 2>&1
   fi
   # manifesto + linha no windows.csv
   cat > "$dir/manifesto.yaml" <<EOF
@@ -207,17 +235,20 @@ rodar_ataque(){ # id, cenario, rep
   spec="${ATAQUE[$cen]}"; img="${spec%%|*}"; args="${spec#*|}"
   local id; id=$(printf 'campanha02-%s-malicioso-r%02d' "$cen" "$rep")
   local TMO_THIS="${TMO[$cen]:-$ATTACK_MAX}"
+  # gerador DETACHED com nome fixo c02-atk (a janela controla o tempo e a parada)
   # shellcheck disable=SC2086
-  janela "$id" "$cen" "malicioso" "${FAMILIA[$cen]}" "$ATT_IP" \
-    docker run --rm --name c02-atk --network "$NET" --ip "$ATT_IP" \
+  janela "$id" "$cen" "malicioso" "${FAMILIA[$cen]}" "$ATT_IP" c02-atk \
+    docker run -d --name c02-atk --network "$NET" --ip "$ATT_IP" \
       --cap-add=NET_RAW --cap-add=NET_ADMIN "$img" $args
 }
 rodar_benigno(){ # cenario(benigno-*), rep
   local cen="$1" rep="$2" famb="${BENIGNO[$1]}"
   local id; id=$(printf 'campanha02-%s-benigno-r%02d' "$cen" "$rep")
   local TMO_THIS=$((BENIGN_DUR + 60))
-  janela "$id" "$cen" "benigno" "$famb" "$BEN_IP" \
-    bash "$HERE/benigno.sh" "$famb" "$HTTP_IP" "$SSH_IP" "$BENIGN_DUR" "$BEN_IP" "$NET" "$LAB"
+  local script; script="$(bash "$HERE/benigno.sh" "$famb" "$HTTP_IP" "$SSH_IP" "$BENIGN_DUR")"
+  janela "$id" "$cen" "benigno" "$famb" "$BEN_IP" c02-ben \
+    docker run -d --name c02-ben --network "$NET" --ip "$BEN_IP" \
+      --cap-add=NET_RAW --cap-add=NET_ADMIN "$LAB" sh -c "$script"
 }
 
 analisar(){

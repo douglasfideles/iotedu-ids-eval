@@ -1,6 +1,0 @@
-error: the following required arguments were not provided:
-  --url <URL>
-
-Usage: dalfox url --url <URL> --custom-payload <CUSTOM_PAYLOAD> <TARGET>...
-
-For more information, try '--help'.

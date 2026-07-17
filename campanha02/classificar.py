@@ -26,9 +26,27 @@ Uso: python3 classificar.py <janelas.csv> <dir_execucoes> <mapa.yaml> <dir_saida
 Requer: PyYAML (só p/ ler o mapa).
 """
 import csv, sys, os, json, re
+from datetime import datetime, timezone
 import yaml
 
 IDS = ["suricata", "snort", "zeek"]
+# margem (s) de tolerância de relógio ao atribuir alertas por timestamp à janela.
+# Zeek escreve notices em lote (atrasado) -> um flood pode "vazar" para janelas
+# seguintes na fatia por offset; o ts real do alerta os desmascara e exclui.
+TS_MARGIN = 5.0
+
+def to_epoch(s):
+    """ISO (…Z / +00:00) -> epoch float, ou None."""
+    if not s:
+        return None
+    s = s.strip().replace("Z", "+00:00")
+    try:
+        return datetime.fromisoformat(s).timestamp()
+    except Exception:
+        try:
+            return datetime.strptime(s[:26], "%Y-%m-%dT%H:%M:%S.%f").replace(tzinfo=timezone.utc).timestamp()
+        except Exception:
+            return None
 
 def carregar_mapa(path):
     m = yaml.safe_load(open(path, encoding="utf-8"))
@@ -54,16 +72,13 @@ def familia_do_msg(msg, ignorar, compilados):
                 return fam
     return "nao-mapeado"   # alerta que não é logging, mas não casou família conhecida
 
-# --- parsers das fatias por IDS: devolvem lista de (msg, src_ip) ---
+# --- parsers das fatias por IDS: devolvem lista de (msg, src_ip, ts_epoch|None) ---
 def parse_suricata(path):
     out = []
     if not os.path.isfile(path):
         return out
     for line in open(path, encoding="utf-8", errors="replace"):
         line = line.strip()
-        if not line or '"event_type":"alert"' not in line.replace(" ", ""):
-            # tolera espaços: recheca via json
-            pass
         try:
             o = json.loads(line)
         except Exception:
@@ -72,7 +87,7 @@ def parse_suricata(path):
             continue
         sig = (o.get("alert") or {}).get("signature", "")
         src = o.get("src_ip", "")
-        out.append((sig, src))
+        out.append((sig, src, to_epoch(o.get("timestamp"))))
     return out
 
 _SNORT_MSG = re.compile(r'\[\*\*\]\s*(?:\[\d+:\d+:\d+\]\s*)?"?([^"\[]+?)"?\s*\[\*\*\]')
@@ -90,7 +105,9 @@ def parse_snort(path):
         # último IP da linha costuma ser o destino; primeiro, a origem
         ips = _IP.findall(line)
         src = ips[0] if ips else ""
-        out.append((msg, src))
+        # Snort alert_fast: "MM/DD-HH:MM:SS.us" (sem ano) -> ts pouco confiável;
+        # mantém None e confia na fatia por offset (writes do Snort são prontos).
+        out.append((msg, src, None))
     return out
 
 def parse_zeek(path):
@@ -102,21 +119,25 @@ def parse_zeek(path):
         if not line or line.startswith("#"):
             continue
         # tenta JSON (notices.jsonl); senão TSV do notice.log
-        msg = src = ""
+        msg = src = ""; ts = None
         if line.startswith("{"):
             try:
                 o = json.loads(line)
                 msg = "%s %s" % (o.get("note", ""), o.get("msg", ""))
                 src = o.get("src", "") or o.get("id.orig_h", "")
+                ts = float(o["ts"]) if o.get("ts") not in (None, "") else None
             except Exception:
                 continue
         else:
             cols = line.split("\t")
             # notice.log padrão: ts uid id.orig_h id.orig_p id.resp_h ... note msg ...
             src = cols[2] if len(cols) > 2 else ""
-            # 'note' e 'msg' ficam por volta das colunas 10-11; junta tudo p/ casar padrão
             msg = " ".join(cols[9:12]) if len(cols) > 11 else " ".join(cols)
-        out.append((msg, src))
+            try:
+                ts = float(cols[0])
+            except Exception:
+                ts = None
+        out.append((msg, src, ts))
     return out
 
 PARSERS = {"suricata": parse_suricata, "snort": parse_snort, "zeek": parse_zeek}
@@ -146,6 +167,7 @@ def main():
         malic = classe.startswith("malic")
         intended = w.get("familia_intencionada") or cenarios.get(cen, "?")
         flush_ip = (w.get("flush_ip") or "").strip()
+        win_ini = to_epoch(w.get("t_start")); win_fim = to_epoch(w.get("t_end"))
         row_counts = {"suricata": 0, "snort": 0, "zeek": 0}
 
         for ids in IDS:
@@ -153,8 +175,13 @@ def main():
             alerts = PARSERS[ids](slc)
             # exclui a rajada de flush (IP descartável) da contagem
             if flush_ip:
-                alerts = [(m, s) for (m, s) in alerts if flush_ip not in (s or "") ]
-            fams = [familia_do_msg(m, ignorar, compilados) for (m, s) in alerts]
+                alerts = [(m, s, t) for (m, s, t) in alerts if flush_ip not in (s or "")]
+            # atribui por TIMESTAMP: descarta alertas cujo ts cai fora da janela
+            # (Zeek escreve em lote -> floods "vazam" para janelas seguintes).
+            if win_ini is not None and win_fim is not None:
+                alerts = [(m, s, t) for (m, s, t) in alerts
+                          if t is None or (win_ini - TS_MARGIN) <= t <= (win_fim + TS_MARGIN)]
+            fams = [familia_do_msg(m, ignorar, compilados) for (m, s, t) in alerts]
             fams = [f for f in fams if f is not None]          # remove LOG/TESTE
             ataque_alertas = [f for f in fams if f in familias_validas]  # famílias reais
             n_total = len(fams)
